@@ -34,8 +34,9 @@ public class MainGUI {
         // Rejestracja paneli
         // Przekazujemy 'this' (MainGUI), aby panele mogły wysyłać sygnały do zmiany widoku
         cardContainer.add(new MainPanel(this), "MENU");
-        cardContainer.add(new GameConfigPanel(), "GAME");
-        cardContainer.add(new AchievementPanel(), "ACHIEVEMENTS");
+        cardContainer.add(new GameConfigPanel(this), "GAME_CONFIG");
+        cardContainer.add(new GamePanel(), "GAME");
+        cardContainer.add(new AchievementPanel(this), "ACHIEVEMENTS");
 
         frame.add(cardContainer);
         
