@@ -1,9 +1,16 @@
 package gui;
 
 import javax.swing.*;
+
+import gamelogic.GameBuilder;
+
 import java.awt.*;
 
 public class GameConfigPanel extends JPanel{
+    private GameBuilder builder;
+    
+
+
     public GameConfigPanel() {
         this.setLayout(new BorderLayout());
         JLabel label = new JLabel("Panel Gry - w budowie");

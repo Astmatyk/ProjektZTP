@@ -10,6 +10,18 @@ public class MainGUI {
 
     public MainGUI() {
         frame = new JFrame("FigureDrawer");
+        // Pobieramy URL do zasobu
+        java.net.URL iconURL = getClass().getResource("graphics/logo.png");
+
+        if (iconURL != null) {
+            // Jeśli plik istnieje, ustaw ikonę
+            frame.setIconImage(new ImageIcon(iconURL).getImage());
+        } else {
+            // Jeśli nie istnieje, wypisz błąd w konsoli zamiast wywalać program
+            System.err.println("BŁĄD: Nie znaleziono pliku ikony pod adresem: graphics/logo.png");
+            System.err.println("Upewnij się, że plik jest w folderze graphics");
+        }
+
         frame.setSize(1200, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
