@@ -1,0 +1,16 @@
+/Board.class
+/Coordinates.class
+/EasyMode.class
+/Game.class
+/GameBuilder.class
+/GameBuilderEvE.class
+/GameBuilderPvE.class
+/GameBuilderPvP.class
+/HardMode.class
+/HumanPlayer.class
+/MapGenerator.class
+/NormalMode.class
+/PcPlayer.class
+/Player.class
+/ShootingStrategy.class
+/ShotResult.class
