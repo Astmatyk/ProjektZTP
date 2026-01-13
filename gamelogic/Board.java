@@ -1,11 +1,13 @@
 package gamelogic;
 
 import gamelogic.enums.*;
-import gamelogic.enums.ShotResult;
 
 public class Board {
     private int size;
     private MapFlags[][] cells;
+
+    // Jeśli false: statki nie mogą się stykać (nawet rogami).
+    // Jeśli true: dotykanie jest dozwolone.
     private boolean allowTouchingShips = false;
 
     public Board(int size) {
@@ -13,6 +15,7 @@ public class Board {
         this.size = size;
         this.cells = new MapFlags[size][size];
 
+        // Inicjalizacja całej planszy jako pusta woda
         for (int y = 0; y < size; y++) {
             for (int x = 0; x < size; x++) {
                 cells[y][x] = MapFlags.NOTHING;
@@ -46,6 +49,7 @@ public class Board {
         return allowTouchingShips;
     }
 
+    // Sprawdza czy współrzędne mieszczą się w planszy.
     public boolean inBounds(int x, int y) {
         return x >= 0 && x < size && y >= 0 && y < size;
     }
@@ -70,6 +74,7 @@ public class Board {
         if (dir == null) throw new IllegalArgumentException("dir is null");
         if (length <= 0) return PlaceResult.LENGTH_INVALID;
 
+        // Liczymy koniec statku, żeby sprawdzić OUT_OF_BOUNDS jednym warunkiem.
         int endX = startX + (length - 1) * dir.dx;
         int endY = startY + (length - 1) * dir.dy;
 
