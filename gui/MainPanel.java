@@ -20,7 +20,7 @@ public class MainPanel extends GuiPanel {
         button0.setPreferredSize(btn_dims);
         button1.setPreferredSize(btn_dims);
         button2.setPreferredSize(btn_dims);
-        button3.setPreferredSize(brn_dims);
+        button3.setPreferredSize(btn_dims);
 
         // Sygnały wysyłane do MainGUI
         button0.addActionListener(e -> parent.showView("GAME_CONFIG"));
