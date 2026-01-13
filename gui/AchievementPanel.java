@@ -34,6 +34,9 @@ public class AchievementPanel extends JPanel {
         scroll.setPreferredSize(new Dimension(300, 300)); 
         
         panel.add(scroll, BorderLayout.CENTER);
+        gbc.gridy = 1;
+        gbc.weighty = 1.0;
+        this.add(panel, gbc);
 
         // 3. PRZYCISK WSTECZ
         gbc.gridy = 2;
