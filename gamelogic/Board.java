@@ -117,20 +117,35 @@ public class Board {
     public ShotResult shoot(int x, int y) {
         requireInBounds(x, y);
 
-        MapFlags f = cells[y][x];
+        switch (cells[y][x]) {
 
-        if (f == MapFlags.SHIP) {
-            cells[y][x] = MapFlags.SHIP_WRECKED;
-            return isShipSunkAt(x, y) ? ShotResult.SINK : ShotResult.HIT;
+            case SHIP -> {
+                cells[y][x] = MapFlags.SHIP_WRECKED;
+                return isShipSunkAt(x, y)
+                        ? ShotResult.SINK
+                        : ShotResult.HIT;
+            }
+
+            case SHIP_WRECKED -> {
+                // już trafione
+                return ShotResult.HIT;
+            }
+
+            case NOTHING -> {
+                // pudło w wodę
+                cells[y][x] = MapFlags.NO_SHIP;
+                return ShotResult.MISS;
+            }
+
+            case NO_SHIP, TERRAIN -> {
+                // już było pudło albo strzał w teren
+                return ShotResult.MISS;
+            }
         }
 
-        if (f == MapFlags.SHIP_WRECKED) {
-            // już trafione
-            return ShotResult.HIT;
-        }
-
-        return ShotResult.MISS;
+        throw new IllegalStateException("Unknown MapFlag");
     }
+
 
     private boolean isShipSunkAt(int x, int y) {
         // Ustalanie orientacji statku

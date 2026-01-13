@@ -46,11 +46,6 @@ public class GameBuilderPvE implements GameBuilder {
     }
 
     @Override
-    public void buildProxies() {
-
-    }
-
-    @Override
     public Game getResult() {
         if (player1 == null || player2 == null) {
             throw new IllegalStateException("Najpierw buildPlayers()");
