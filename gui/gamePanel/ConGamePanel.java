@@ -1,11 +1,12 @@
 package gui.gamePanel;
 
-import javax.swing.*;
+import gui.MainGUI;
 import java.awt.*;
+import javax.swing.*;
 
 public class ConGamePanel extends JPanel implements GamePanelInterface {
 
-    public ConGamePanel() {
+    public ConGamePanel(MainGUI mainGUI) {
         setLayout(new BorderLayout());
 
         JLabel label = new JLabel("Panel Rozgrywki - w budowie");
@@ -13,6 +14,7 @@ public class ConGamePanel extends JPanel implements GamePanelInterface {
         add(label, BorderLayout.CENTER);
 
         JButton backButton = new JButton("Wstecz");
+        backButton.addActionListener(e -> mainGUI.showView("MENU"));
         add(backButton, BorderLayout.SOUTH);
     }
 
