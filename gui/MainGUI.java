@@ -1,10 +1,8 @@
 package gui;
 
-import javax.swing.*;
-
-import gui.gamePanel.GamePanelInterface;
-
+import gui.gamePanel.ConGamePanel;
 import java.awt.*;
+import javax.swing.*;
 
 public class MainGUI {
     private JFrame frame;
@@ -38,10 +36,9 @@ public class MainGUI {
         // Przekazujemy 'this' (MainGUI), aby panele mogły wysyłać sygnały do zmiany widoku
         cardContainer.add(new MainPanel(this), "MENU");
         cardContainer.add(new GameConfigPanel(this), "GAME_CONFIG");
-        cardContainer.add(new GamePanelInterface() {
-            public void display() {};
-        }(), "GAME");
-        cardContainer.add(new AchievementPanel(this), "ACHIEVEMENTS");
+        cardContainer.add(new ConGamePanel(), "GAME");
+        cardContainer.add(new AchievementPanel(this), "ACHIEVEMENT");
+        cardContainer.add(new RankingPanel(this), "RANKING");
 
         frame.add(cardContainer);
         

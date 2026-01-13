@@ -1,11 +1,13 @@
 package gui.gamePanel;
 
-public class EvEGamePanel extends GamePanelDecorator{
-    public EvEGamePanel() {
-        super();
+public class EvEGamePanel extends GamePanelDecorator {
+    public EvEGamePanel(GamePanelInterface panel) {
+        super(panel);
     }
 
-    public void displayBehavior(){
+    @Override
+    public void display() {
         System.out.println("EvE Game Panel Behavior");
+        super.display();
     }
 }

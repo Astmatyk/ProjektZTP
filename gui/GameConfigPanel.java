@@ -3,87 +3,151 @@ package gui;
 import javax.swing.*;
 import java.awt.*;
 
+import gui.gameconfig.PvEBoardConfigurator;
+
 public class GameConfigPanel extends JPanel {
+    String modeFlag;        // globalny tryb gry
+    int mapSize;            // globalny rozmiar planszy
+    boolean useIslands;     // globalna flaga wysp
+    boolean boardsConfigured = false; // czy plansze zostały skonfigurowane (PvP/PvE)
+    JButton playButton;
 
     public GameConfigPanel(MainGUI mainGUI) {
-        // Ustawiamy GridBagLayout, aby mieć pełną kontrolę nad siatką
         this.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // Marginesy między elementami
+        gbc.insets = new Insets(10,10,10,10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // --- 1. MENU WYBORU (Góra) ---
-        JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        // Nagłówek trybu gry
+        JLabel modeLabel = new JLabel("Tryb gry", SwingConstants.CENTER);
+        modeLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        gbc.gridx = 0; gbc.gridy = 0;
+        this.add(modeLabel, gbc);
+
+        // Panel trybu gry
+        JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.CENTER,20,10));
         JRadioButton pvp = new JRadioButton("Gracz vs Gracz", true);
         JRadioButton pvc = new JRadioButton("Gracz vs Komputer");
         JRadioButton cvc = new JRadioButton("Komputer vs Komputer");
-        
-        ButtonGroup modeGroup = new ButtonGroup();
-        modeGroup.add(pvp);
-        modeGroup.add(pvc);
-        modeGroup.add(cvc);
-        
-        modePanel.add(pvp);
-        modePanel.add(pvc);
-        modePanel.add(cvc);
 
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.gridwidth = 2; // Rozciągamy na dwie kolumny
+        ButtonGroup modeGroup = new ButtonGroup();
+        modeGroup.add(pvp); modeGroup.add(pvc); modeGroup.add(cvc);
+
+        modePanel.add(pvp); modePanel.add(pvc); modePanel.add(cvc);
+        gbc.gridy = 1;
         this.add(modePanel, gbc);
 
-        // --- 2. PANELE KONFIGURACJI (Środek) ---
-        // Lewy panel
-        JPanel leftConfig = createConfigBox("Konfiguracja Gracza 1");
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.gridwidth = 1;
-        gbc.weightx = 0.5;
-        this.add(leftConfig, gbc);
+        // Aktualizacja flagi trybu
+        pvp.addActionListener(e -> { modeFlag="PVP"; updatePlayButtonState(); });
+        pvc.addActionListener(e -> { modeFlag="PVE"; updatePlayButtonState(); });
+        cvc.addActionListener(e -> { modeFlag="EVE"; updatePlayButtonState(); });
+        modeFlag="PVP";
 
-        // Prawy panel
-        JPanel rightConfig = createConfigBox("Konfiguracja Gracza 2");
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        this.add(rightConfig, gbc);
-
-        // --- 3. PRZYCISKI NA DOLE ---
-        JPanel actionPanel = new JPanel(new GridLayout(1, 2, 20, 0));
-        JButton playButton = new JButton("Graj");
-        JButton backButton = new JButton("Wstecz");
-
-        // Rozmiar przycisków
-        playButton.setPreferredSize(new Dimension(150, 40));
-        backButton.setPreferredSize(new Dimension(150, 40));
-
-        actionPanel.add(playButton);
-        actionPanel.add(backButton);
-
-        gbc.gridx = 0;
+        // Nagłówek ustawień planszy
+        JLabel boardLabel = new JLabel("Ustawienia planszy", SwingConstants.CENTER);
+        boardLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
         gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.weightx = 0;
-        gbc.anchor = GridBagConstraints.CENTER;
-        gbc.fill = GridBagConstraints.NONE;
+        this.add(boardLabel, gbc);
+
+        // Panel ustawień planszy
+        JPanel boardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER,20,10));
+        JRadioButton sizeTen = new JRadioButton("10x10", true);
+        JRadioButton sizeTwenty = new JRadioButton("20x20");
+        JRadioButton sizeThirty = new JRadioButton("30x30");
+        JCheckBox islands = new JCheckBox("Wyspy");
+
+        ButtonGroup sizeGroup = new ButtonGroup();
+        sizeGroup.add(sizeTen); sizeGroup.add(sizeTwenty); sizeGroup.add(sizeThirty);
+
+        boardPanel.add(sizeTen); boardPanel.add(sizeTwenty); boardPanel.add(sizeThirty); boardPanel.add(islands);
+        gbc.gridy = 3;
+        this.add(boardPanel, gbc);
+
+        // Ustawienia mapSize i useIslands
+        Runnable updateMapSettings = () -> {
+            mapSize = sizeTen.isSelected()?10:sizeTwenty.isSelected()?20:30;
+            useIslands = islands.isSelected();
+        };
+        sizeTen.addActionListener(e->updateMapSettings.run());
+        sizeTwenty.addActionListener(e->updateMapSettings.run());
+        sizeThirty.addActionListener(e->updateMapSettings.run());
+        islands.addActionListener(e->updateMapSettings.run());
+        updateMapSettings.run();
+
+        // Przycisk konfiguracji plansz
+        JButton configBoardButton = new JButton("Konfiguracja plansz");
+        gbc.gridy = 4; gbc.fill=GridBagConstraints.HORIZONTAL;
+        this.add(configBoardButton, gbc);
+
+        // Enable/disable przycisku
+        Runnable updateConfigButton = () -> configBoardButton.setEnabled(pvp.isSelected() || pvc.isSelected());
+        pvp.addActionListener(e->updateConfigButton.run());
+        pvc.addActionListener(e->updateConfigButton.run());
+        cvc.addActionListener(e->updateConfigButton.run());
+        updateConfigButton.run();
+
+        // Przycisk Graj / Wstecz
+        JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER,20,10));
+        playButton = new JButton("Graj");
+        JButton backButton = new JButton("Wstecz");
+        actionPanel.add(playButton); actionPanel.add(backButton);
+        gbc.gridy=5; gbc.fill=GridBagConstraints.NONE;
         this.add(actionPanel, gbc);
 
-        // --- AKCJE ---
+        // Akcje
         backButton.addActionListener(e -> mainGUI.showView("MENU"));
-        
-        playButton.addActionListener(e -> {
-            // Tutaj logika uruchomienia gry
-            System.out.println("Uruchamiam grę...");
-            mainGUI.showView("GAME"); // Załóżmy, że masz taki widok
+
+        configBoardButton.addActionListener(e -> {
+            if(modeFlag.equals("PVE")) {
+                PvEBoardConfigurator configurator = new PvEBoardConfigurator(mapSize);
+                int result = JOptionPane.showConfirmDialog(
+                        this,
+                        configurator,
+                        "Konfiguracja planszy - PvE",
+                        JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE
+                );
+                if(result==JOptionPane.OK_OPTION) {
+                    boolean[][] playerBoard = configurator.getPlayerBoard();
+                    boardsConfigured = true;
+                    updatePlayButtonState();
+                    System.out.println("Plansza gracza PvE:");
+                    printBoard(playerBoard);
+                    System.out.println("Plansza komputera PvE będzie generowana w Builderze");
+                }
+            } else if(modeFlag.equals("PVP")) {
+                System.out.println("Tu uruchamiamy konfigurator PvP");
+                boardsConfigured=true;
+                updatePlayButtonState();
+            }
         });
+
+        playButton.addActionListener(e -> {
+            if(modeFlag.equals("EVE")) {
+                System.out.println("Tworzę automatyczne plansze dla EvE");
+            } else if(!boardsConfigured) {
+                System.out.println("Najpierw skonfiguruj plansze!");
+                return;
+            }
+            System.out.println("Wybrany tryb: "+modeFlag);
+            System.out.println("Rozmiar planszy: "+mapSize);
+            System.out.println("Wyspy: "+useIslands);
+
+            mainGUI.showView("GAME");
+        });
+
+        updatePlayButtonState();
     }
 
-    // Metoda pomocnicza do tworzenia ramek konfiguracji
-    private JPanel createConfigBox(String title) {
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(title));
-        panel.setPreferredSize(new Dimension(250, 150));
-        // Tutaj możesz dodać np. JComboBox dla wyboru koloru lub pola tekstowe
-        panel.add(new JLabel("Opcje planszy..."));
-        return panel;
+    private void updatePlayButtonState() {
+        if(modeFlag.equals("EVE")) playButton.setEnabled(true);
+        else playButton.setEnabled(boardsConfigured);
+    }
+
+    private void printBoard(boolean[][] board){
+        for(boolean[] row:board){
+            for(boolean cell:row) System.out.print(cell?"S ":" .");
+            System.out.println();
+        }
     }
 }

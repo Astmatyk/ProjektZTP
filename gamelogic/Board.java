@@ -1,5 +1,7 @@
 package gamelogic;
+
 import gamelogic.enums.*;
+import gamelogic.enums.ShotResult;
 
 public class Board {
     private int size;
@@ -52,6 +54,7 @@ public class Board {
         requireInBounds(x, y);
         return cells[y][x];
     }
+
     public void setFlag(MapFlags flag, int x, int y) {
         requireInBounds(x, y);
         if (flag == null) throw new IllegalArgumentException("flag is null");
@@ -61,6 +64,7 @@ public class Board {
     public void setAllowTouchingShips(boolean allowTouchingShips) {
         this.allowTouchingShips = allowTouchingShips;
     }
+    
 
     public PlaceResult placeShip(int startX, int startY, int length, Direction dir) {
         if (dir == null) throw new IllegalArgumentException("dir is null");

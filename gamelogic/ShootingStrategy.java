@@ -1,5 +1,5 @@
 package gamelogic;
 
 public interface ShootingStrategy {
-    public Coordinates chooseCoordinates(Board shootingBoard);
+    Coordinates chooseCoordinates(Board shootingBoard);
 }

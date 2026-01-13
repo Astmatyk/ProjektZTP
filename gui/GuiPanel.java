@@ -9,7 +9,7 @@ public class GuiPanel extends JPanel {
         button.setBorderPainted(false);
         button.setContentAreaFilled(false);
         button.setOpaque(false);
-        button.setHorizontalAlignment(SwingConstants.LEFT);
+        button.setHorizontalAlignment(SwingConstants.CENTER);
 
         button.addActionListener(e -> action.run());
         return button;

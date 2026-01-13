@@ -5,5 +5,7 @@ public enum MapFlags {
     TERRAIN,
     NO_SHIP,
     SHIP,
-    SHIP_WRECKED
+    SHIP_WRECKED,
+    HIT,
+    MISS
 }

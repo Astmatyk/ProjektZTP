@@ -1,13 +1,38 @@
 package gamelogic;
 
-public class Player {
-    private Board ownBoard;
-    private Board shootingBoard;
-    private ShotResult shotResult;
-    private ShootingStrategy strategy;
+import gamelogic.enums.MapFlags;
+import gamelogic.enums.ShotResult;
+
+public abstract class Player {
+
+    protected Board ownBoard;
+    protected Board shootingBoard;
 
     public Player(Board ownBoard, Board shootingBoard) {
         this.ownBoard = ownBoard;
         this.shootingBoard = shootingBoard;
+    }
+
+    public abstract Coordinates chooseCoordinates();
+
+    // Gracz otrzymuje strzal od przeciwnika
+    public ShotResult receiveShot(Coordinates coords) {
+        return ownBoard.shoot(coords.x, coords.y);
+    }
+
+    // Aktualizacja własnego shootingBoard na podstawie wyniku strzalu
+    public void updateShootingBoard(Coordinates coords, ShotResult result) {
+        switch (result) {
+            case MISS -> shootingBoard.setFlag(MapFlags.NOTHING, coords.x, coords.y);
+            case HIT, SINK -> shootingBoard.setFlag(MapFlags.SHIP_WRECKED, coords.x, coords.y);
+        }
+    }
+
+    public Board getOwnBoard() {
+        return ownBoard;
+    }
+
+    public Board getShootingBoard() {
+        return shootingBoard;
     }
 }
