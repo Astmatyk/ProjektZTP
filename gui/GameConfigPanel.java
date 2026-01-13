@@ -1,6 +1,13 @@
 package gui;
 
 import javax.swing.*;
+
+import gui.gamePanel.ConGamePanel;
+import gui.gamePanel.EvEGamePanel;
+import gui.gamePanel.GamePanelInterface;
+import gui.gamePanel.PvEGamePanel;
+import gui.gamePanel.PvPGamePanel;
+
 import java.awt.*;
 
 public class GameConfigPanel extends JPanel {
@@ -71,9 +78,21 @@ public class GameConfigPanel extends JPanel {
         backButton.addActionListener(e -> mainGUI.showView("MENU"));
         
         playButton.addActionListener(e -> {
-            // Tutaj logika uruchomienia gry
-            System.out.println("Uruchamiam grę...");
-            mainGUI.showView("GAME"); // Załóżmy, że masz taki widok
+            GamePanelInterface basePanel = new ConGamePanel();
+            GamePanelInterface decoratedPanel;
+
+            if (pvp.isSelected()) {
+                decoratedPanel = new PvPGamePanel(basePanel);
+            } else if (pvc.isSelected()) {
+                decoratedPanel = new PvEGamePanel(basePanel);
+            } else {
+                decoratedPanel = new EvEGamePanel(basePanel);
+            }   
+            // Wywołanie specyficznego zachowania
+            decoratedPanel.display();
+
+            // Wyświetlenie w GUI
+            mainGUI.showView("GAME"); 
         });
     }
 
