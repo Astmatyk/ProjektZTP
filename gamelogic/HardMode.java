@@ -9,20 +9,33 @@ public class HardMode implements ShootingStrategy {
 
     @Override
     public Coordinates chooseCoordinates(Board board) {
-        List<Coordinates> hits = board.getAllHits();
-
-        if (!hits.isEmpty()) {
-            for (Coordinates h : hits) {
-                for (Coordinates n : board.getNeighbors(h)) {
-                    if (board.getFlag(n.x, n.y) == MapFlags.NOTHING)
-                        return n;
+        int size = board.getSize();
+  
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                if (board.getFlag(x, y) == MapFlags.SHIP_WRECKED) {
+                    // szukaj NOTHING (nie zestrzelone) w poblizu
+                    List<Coordinates> neighbors = getNeighbors(x, y, size);
+                    for (Coordinates n : neighbors) {
+                        if (board.getFlag(n.x, n.y) == MapFlags.NOTHING)
+                            return n;
+                    }
                 }
             }
         }
-
         return randomShot(board);
     }
 
+    private List<Coordinates> getNeighbors(int x, int y, int size) {
+        List<Coordinates> neighbors = new ArrayList<>();
+        if (x > 0) neighbors.add(new Coordinates(x - 1, y));
+        if (x < size - 1) neighbors.add(new Coordinates(x + 1, y));
+        if (y > 0) neighbors.add(new Coordinates(x, y - 1));
+        if (y < size - 1) neighbors.add(new Coordinates(x, y + 1));
+        return neighbors;
+    }
+    
+    
     private Coordinates randomShot(Board board) {
         int size = board.getSize();
         while (true) {

@@ -8,32 +8,46 @@ public class NormalMode implements ShootingStrategy {
     private Random rand = new Random();
 
     @Override
-    public Coordinates chooseCoordinates(Board board) {
+    public Coordinates chooseCoordinates(Board shootingBoard) {
 
-        List<Coordinates> hits = board.getAllHits();
+        int size = shootingBoard.getSize();
 
-        // Jeśli mamy trafienia i los < 50% → dobijamy
-        if (!hits.isEmpty() && rand.nextBoolean()) {
-            Coordinates base = hits.get(hits.size() - 1);
-            List<Coordinates> neighbors = board.getNeighbors(base);
-
-            Collections.shuffle(neighbors);
-            for (Coordinates c : neighbors) {
-                if (board.getFlag(c.x, c.y) == MapFlags.NOTHING)
-                    return c;
+        // losowanie fifty-fifty czy ma losowac czy sie starac
+        if (rand.nextBoolean()) {
+            // szuka ostatniego trafienia
+            for (int y = 0; y < size; y++) {
+                for (int x = 0; x < size; x++) {
+                    if (shootingBoard.getFlag(x, y) == MapFlags.SHIP_WRECKED) {
+                        // sprawdza
+                        List<Coordinates> neighbors = getNeighbors(x, y, size);
+                        Collections.shuffle(neighbors);
+                        for (Coordinates n : neighbors) {
+                            if (shootingBoard.getFlag(n.x, n.y) == MapFlags.NOTHING) {
+                                return n;
+                            }
+                        }
+                    }
+                }
             }
         }
-
-        // fallback → losowo
-        return randomShot(board);
+        return randomShot(shootingBoard);
     }
 
-    private Coordinates randomShot(Board board) {
-        int size = board.getSize();
+    private List<Coordinates> getNeighbors(int x, int y, int size) {
+        List<Coordinates> neighbors = new ArrayList<>();
+        if (x > 0) neighbors.add(new Coordinates(x - 1, y));
+        if (x < size - 1) neighbors.add(new Coordinates(x + 1, y));
+        if (y > 0) neighbors.add(new Coordinates(x, y - 1));
+        if (y < size - 1) neighbors.add(new Coordinates(x, y + 1));
+        return neighbors;
+    }
+
+    private Coordinates randomShot(Board shootingBoard) {
+        int size = shootingBoard.getSize();
         while (true) {
             int x = rand.nextInt(size);
             int y = rand.nextInt(size);
-            if (board.getFlag(x, y) == MapFlags.NOTHING)
+            if (shootingBoard.getFlag(x, y) == MapFlags.NOTHING)
                 return new Coordinates(x, y);
         }
     }

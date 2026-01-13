@@ -15,15 +15,17 @@ public abstract class Player {
 
     public abstract Coordinates chooseCoordinates();
 
+    // Gracz otrzymuje strzal od przeciwnika
     public ShotResult receiveShot(Coordinates coords) {
-        return ownBoard.receiveShot(coords);
+        return ownBoard.shoot(coords.x, coords.y);
     }
 
+    // Aktualizacja własnego shootingBoard na podstawie wyniku strzalu
     public void updateShootingBoard(Coordinates coords, ShotResult result) {
-        if (result == ShotResult.MISS)
-            shootingBoard.setFlag(MapFlags.MISS, coords.x, coords.y);
-        else
-            shootingBoard.setFlag(MapFlags.HIT, coords.x, coords.y);
+        switch (result) {
+            case MISS -> shootingBoard.setFlag(MapFlags.NOTHING, coords.x, coords.y);
+            case HIT, SINK -> shootingBoard.setFlag(MapFlags.SHIP_WRECKED, coords.x, coords.y);
+        }
     }
 
     public Board getOwnBoard() {
