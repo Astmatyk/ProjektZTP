@@ -1,11 +1,9 @@
 package gamelogic;
 
-
-import gamelogic.enums.EventType;
+import gamelogic.achievements.AchievementManager;
 import gamelogic.enums.ShotResult;
 import java.util.List;
 import java.util.ArrayList;
-import gamelogic.achievements.AchievementManager;
 
 public class Game {
 
@@ -15,7 +13,7 @@ public class Game {
     private boolean gameOver = false;
     private GameHistory history;
     private final String gameId;
-    private List<GameListener> listenersList ;
+    private List<GameListener> listenersList = new ArrayList<>();
 
     public Game(Player p1, Player p2) {
         this(p1, p2, String.valueOf(System.currentTimeMillis()));
@@ -27,8 +25,6 @@ public class Game {
         this.currentPlayer = p1;
         this.gameId = gameId != null ? gameId : String.valueOf(System.currentTimeMillis());
         this.history = new GameHistory(this.gameId);
-        this.listenersList = new ArrayList<>();
-        this.listenersList.add(new AchievementManager());
     }
 
     public Player getOpponent(Player p) {
@@ -42,12 +38,7 @@ public class Game {
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
-    public void notify(Event event) {
-    for(GameListener listener: listenersList)
-    {
-        listener.update(event);
-    }
-    }
+
     public ShotResult shoot(Player attacker, Coordinates coords) {
         if (gameOver || attacker != currentPlayer) {
             throw new IllegalStateException("Not your turn or game over");
@@ -61,10 +52,8 @@ public class Game {
         // Strzelający aktualizuje swoją mapę strzałów
         attacker.updateShootingBoard(coords, result);
 
-        notify(new Event(EventType.SHOT_FIRED,(result!=ShotResult.MISS) ,attacker));
         // Sprawdzenie końca gry
         if (defender.getOwnBoard().isAllShipsSink()) {
-            notify(new Event(EventType.GAME_END,true ,attacker));
             gameOver = true;
         } else {
             // zmiana tury tylko jeśli pudło
@@ -103,5 +92,4 @@ public class Game {
     public void addListener(GameListener listener) {
     listenersList.add(listener);
     }
-
 }
