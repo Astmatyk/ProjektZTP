@@ -15,5 +15,5 @@ Marcin Lenkiewicz:
 -Strategy: ShootingStrategy, EasyMode, NormalMode, HardMode
 
 Michał Wilczewski:
--
--Observer: 
+- Game
+-Observer: GameListener, AchievementManager, Achievement, WinOneGame, LoseOneGame, ShootFiveShots, MissTenTimes
