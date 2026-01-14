@@ -50,14 +50,9 @@ public class GameBuilderEvE implements GameBuilder {
 
     @Override
     public Game getResult() {
-        return getResult(null); // null => Game samo wygeneruje ID
-    }
-
-    @Override
-    public Game getResult(String gameId) {
         if (player1 == null || player2 == null) {
             throw new IllegalStateException("Najpierw buildPlayers()");
         }
-        return new Game(player1, player2, gameId);
+        return new Game(player1, player2);
     }
 }

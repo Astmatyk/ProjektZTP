@@ -48,23 +48,13 @@ public class GameBuilderPvE implements GameBuilder {
         player1 = new HumanPlayer(board1, sBoard1, humanName);
         player2 = new PcPlayer(board2, sBoard2, strategy);
     }
-
-    @Override
-    public Game getResult() {
-        return getResult(null); // null => Game samo wygeneruje ID
-    }
-
-    @Override
-    public Game getResult() {
-        return getResult(null); // null => Game samo wygeneruje ID
-    }
     
     @Override
-    public Game getResult(String gameId) {
+    public Game getResult() {
         if (player1 == null || player2 == null) {
             throw new IllegalStateException("Najpierw buildPlayers()");
         }
-        return new Game(player1, player2, gameId);
+        return new Game(player1, player2);
     }
 }
 
