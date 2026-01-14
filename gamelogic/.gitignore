@@ -1,0 +1,49 @@
+/Board.class
+/Coordinates.class
+/EasyMode.class
+/Game.class
+/GameBuilder.class
+/GameBuilderEvE.class
+/GameBuilderPvE.class
+/GameBuilderPvP.class
+/HardMode.class
+/HumanPlayer.class
+/MapGenerator.class
+/NormalMode.class
+/PcPlayer.class
+/Player.class
+/ShootingStrategy.class
+/ShotResult.class
+/Board$Direction.class
+/Board$PlaceResult.class
+
+# ===== IntelliJ IDEA =====
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# ===== Java build =====
+target/
+out/
+build/
+*.class
+
+# ===== Maven / Gradle =====
+.mvn/
+.gradle/
+
+# ===== Logs =====
+*.log
+
+# ===== Temporary / backup =====
+*.tmp
+*.swp
+*.bak
+*.old
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+

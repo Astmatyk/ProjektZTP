@@ -1,0 +1,19 @@
+# .class
+*.class
+
+# IDE
+/.idea/
+*.iml
+*.ipr
+*.iws
+/.vscode/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# class
+**/*.class

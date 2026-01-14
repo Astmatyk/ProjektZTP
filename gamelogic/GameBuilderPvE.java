@@ -55,8 +55,8 @@ public class GameBuilderPvE implements GameBuilder {
     }
 
     @Override
-    public void buildProxies() {
-
+    public Game getResult() {
+        return getResult(null); // null => Game samo wygeneruje ID
     }
     
     @Override
