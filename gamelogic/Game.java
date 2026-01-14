@@ -11,12 +11,15 @@ public class Game {
     private GameHistory history;
     private final String gameId;
 
-    //nowa gra
     public Game(Player p1, Player p2) {
+        this(p1, p2, String.valueOf(System.currentTimeMillis()));
+    }
+
+    public Game(Player p1, Player p2, String gameId) {
         this.player1 = p1;
         this.player2 = p2;
         this.currentPlayer = p1;
-        this.gameId = String.valueOf(System.currentTimeMillis());
+        this.gameId = gameId != null ? gameId : String.valueOf(System.currentTimeMillis());
         this.history = new GameHistory(this.gameId);
     }
 
