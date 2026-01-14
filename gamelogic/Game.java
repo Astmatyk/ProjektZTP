@@ -18,15 +18,10 @@ public class Game {
 
     //nowa gra
     public Game(Player p1, Player p2) {
-        this(p1, p2, String.valueOf(System.currentTimeMillis()));
-    }
-
-    //gra istniejąca
-    public Game(Player p1, Player p2, String gameId) {
         this.player1 = p1;
         this.player2 = p2;
         this.currentPlayer = p1;
-        this.gameId = gameId != null ? gameId : String.valueOf(System.currentTimeMillis());
+        this.gameId = String.valueOf(System.currentTimeMillis());
         this.history = new GameHistory(this.gameId);
     }
 
@@ -65,11 +60,14 @@ public class Game {
             }
         }
 
+        // po każdym strzale następuje save naszego stanu
+        save(result);
+
         return result;
     }
 
-    public Snapshot save() {
-        Snapshot snap = new Snapshot(player1, player2, currentPlayer, null);
+    public Snapshot save(ShotResult result) {
+        Snapshot snap = new Snapshot(player1, player2, currentPlayer, result);
         history.push(snap);
         return snap;
     }

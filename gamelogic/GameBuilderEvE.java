@@ -43,21 +43,24 @@ public class GameBuilderEvE implements GameBuilder {
             case NORMAL -> new NormalMode();
             case HARD -> new HardMode();
         };
+        
+        Board sBoard1=new Board(mapSize);
+        Board sBoard2=new Board(mapSize);
 
-        player1 = new PcPlayer(board1, board2, s1);
-        player2 = new PcPlayer(board2, board1, s2);
-    }
-
-    @Override
-    public void buildProxies() {
-
+        player1 = new PcPlayer(board1, sBoard1, s1);
+        player2 = new PcPlayer(board2, sBoard2, s2);
     }
 
     @Override
     public Game getResult() {
+        return getResult(null); // null => Game samo wygeneruje ID
+    }
+
+    @Override
+    public Game getResult(String gameId) {
         if (player1 == null || player2 == null) {
             throw new IllegalStateException("Najpierw buildPlayers()");
         }
-        return new Game(player1, player2);
+        return new Game(player1, player2, gameId);
     }
 }

@@ -34,7 +34,7 @@ public class GameBuilderPvE implements GameBuilder {
             throw new IllegalStateException("Najpierw buildBoard()");
         }
 
-        player1 = new HumanPlayer(board1, board2, humanName);
+
 
         ShootingStrategy strategy = switch (difficulty) {
             case EASY -> new EasyMode();
@@ -42,20 +42,29 @@ public class GameBuilderPvE implements GameBuilder {
             case HARD -> new HardMode();
         };
 
-        player2 = new PcPlayer(board2, board1, strategy);
-    }
+        Board sBoard1=new Board(mapSize);
+        Board sBoard2=new Board(mapSize);
 
-    @Override
-    public void buildProxies() {
-
+        player1 = new HumanPlayer(board1, sBoard1, humanName);
+        player2 = new PcPlayer(board2, sBoard2, strategy);
     }
 
     @Override
     public Game getResult() {
+        return getResult(null); // null => Game samo wygeneruje ID
+    }
+
+    @Override
+    public Game getResult() {
+        return getResult(null); // null => Game samo wygeneruje ID
+    }
+    
+    @Override
+    public Game getResult(String gameId) {
         if (player1 == null || player2 == null) {
             throw new IllegalStateException("Najpierw buildPlayers()");
         }
-        return new Game(player1, player2);
+        return new Game(player1, player2, gameId);
     }
 }
 
