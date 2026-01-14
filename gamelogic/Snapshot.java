@@ -1,12 +1,12 @@
 package gamelogic;
 
+import gamelogic.enums.*;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import gamelogic.enums.ShotResult;
 
 public class Snapshot implements Serializable {
     private Player p1Board;
