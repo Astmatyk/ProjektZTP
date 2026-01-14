@@ -1,9 +1,10 @@
 package gamelogic;
 
-import gamelogic.achievements.AchievementManager;
+
 import gamelogic.enums.ShotResult;
 import java.util.List;
 import java.util.ArrayList;
+import gamelogic.achievements.AchievementManager;
 
 public class Game {
 
