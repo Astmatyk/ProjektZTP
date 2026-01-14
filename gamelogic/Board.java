@@ -1,6 +1,6 @@
 package gamelogic;
+
 import gamelogic.enums.*;
-import gamelogic.enums.ShotResult;
 import java.io.Serializable;
 
 public class Board implements Serializable {
