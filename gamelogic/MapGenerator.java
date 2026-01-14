@@ -55,9 +55,28 @@ public class MapGenerator {
                     Board.PlaceResult res =
                             board.placeShip(x, y, len, dir);
 
-                    if (res != Board.PlaceResult.OK) {
-                        throw new IllegalStateException(
-                                "Niepoprawna konfiguracja planszy"
+                    switch (res) {
+                        case OK -> {
+                        }
+
+                        case OUT_OF_BOUNDS -> throw new IllegalStateException(
+                                "Statek wychodzi poza planszę"
+                        );
+
+                        case LENGTH_INVALID -> throw new IllegalStateException(
+                                "Niepoprawna długość statku"
+                        );
+
+                        case COLLIDES -> throw new IllegalStateException(
+                                "Statki nachodzą na siebie"
+                        );
+
+                        case TOUCHING_NOT_ALLOWED -> throw new IllegalStateException(
+                                "Statki nie mogą się stykać"
+                        );
+
+                        default -> throw new IllegalStateException(
+                                "Nieznany błąd konfiguracji planszy"
                         );
                     }
                 }
