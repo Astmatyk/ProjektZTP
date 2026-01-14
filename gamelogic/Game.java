@@ -1,6 +1,9 @@
 package gamelogic;
 
+import gamelogic.achievements.AchievementManager;
 import gamelogic.enums.ShotResult;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Game {
 
@@ -10,6 +13,7 @@ public class Game {
     private boolean gameOver = false;
     private GameHistory history;
     private final String gameId;
+    private List<GameListener> listenersList = new ArrayList<>();
 
     public Game(Player p1, Player p2) {
         this(p1, p2, String.valueOf(System.currentTimeMillis()));
@@ -84,5 +88,8 @@ public class Game {
 
     public GameHistory getHistory() {
         return history;
+    }
+    public void addListener(GameListener listener) {
+    listenersList.add(listener);
     }
 }
