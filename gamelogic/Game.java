@@ -39,7 +39,12 @@ public class Game {
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
-
+    public void notify(Event event) {
+    for(GameListener listener: listenersList)
+    {
+        listener.update(event);
+    }
+    }
     public ShotResult shoot(Player attacker, Coordinates coords) {
         if (gameOver || attacker != currentPlayer) {
             throw new IllegalStateException("Not your turn or game over");
@@ -93,4 +98,5 @@ public class Game {
     public void addListener(GameListener listener) {
     listenersList.add(listener);
     }
+
 }
