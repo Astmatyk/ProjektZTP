@@ -43,9 +43,12 @@ public class GameBuilderEvE implements GameBuilder {
             case NORMAL -> new NormalMode();
             case HARD -> new HardMode();
         };
+        
+        Board sBoard1=new Board(mapSize);
+        Board sBoard2=new Board(mapSize);
 
-        player1 = new PcPlayer(board1, board2, s1);
-        player2 = new PcPlayer(board2, board1, s2);
+        player1 = new PcPlayer(board1, sBoard1, s1);
+        player2 = new PcPlayer(board2, sBoard2, s2);
     }
 
     @Override
