@@ -1,6 +1,7 @@
 package gamelogic;
 
 
+import gamelogic.enums.EventType;
 import gamelogic.enums.ShotResult;
 import java.util.List;
 import java.util.ArrayList;
@@ -58,8 +59,10 @@ public class Game {
         // Strzelający aktualizuje swoją mapę strzałów
         attacker.updateShootingBoard(coords, result);
 
+        notify(new Event(EventType.SHOT_FIRED,(result!=ShotResult.MISS) ,attacker));
         // Sprawdzenie końca gry
         if (defender.getOwnBoard().isAllShipsSink()) {
+            notify(new Event(EventType.GAME_END,true ,attacker));
             gameOver = true;
         } else {
             // zmiana tury tylko jeśli pudło
