@@ -18,12 +18,9 @@ public class GameBuilderEvE implements GameBuilder {
     }
 
     @Override
-    public void buildBoard(MapType mapType) {
+    public void buildBoard() {
         board1 = new Board(mapSize);
         board2 = new Board(mapSize);
-
-        MapGenerator.generate(mapType, board1, mapSize);
-        MapGenerator.generate(mapType, board2, mapSize);
     }
 
     @Override

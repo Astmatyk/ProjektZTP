@@ -7,25 +7,25 @@ public class GameBuilderPvE implements GameBuilder {
     private final String humanName;
     private final BotDifficulty difficulty;
 
+    private final boolean[][] playerLayout;
+
     private Board board1;
     private Board board2;
 
     private Player player1;
     private Player player2;
 
-    public GameBuilderPvE(int mapSize, String humanName, BotDifficulty difficulty) {
+    public GameBuilderPvE(int mapSize, String humanName, BotDifficulty difficulty, boolean[][] playerLayout) {
         this.mapSize = mapSize;
         this.humanName = humanName;
         this.difficulty = difficulty;
+        this.playerLayout = playerLayout;
     }
 
     @Override
-    public void buildBoard(MapType mapType) {
-        board1 = new Board(mapSize);
+    public void buildBoard() {
+        board1 = MapGenerator.fromLayout(mapSize, playerLayout);
         board2 = new Board(mapSize);
-
-        MapGenerator.generate(mapType, board1, mapSize);
-        MapGenerator.generate(mapType, board2, mapSize);
     }
 
     @Override
