@@ -8,13 +8,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Stack;
 
-//TODO: udokumentować jakoś ładnie bo jest padaka
 public class GameHistory {
 	private final Stack<Snapshot> history = new Stack<>();
 	private final String gameId;
 
 	public GameHistory(String gameId) {
-		if (gameId == null || gameId.isEmpty()) throw new IllegalArgumentException("gameId is required");
+		if (gameId == null || gameId.isEmpty()) throw new IllegalArgumentException("wymagane id gry!");
 		this.gameId = gameId;
 	}
 
@@ -25,22 +24,8 @@ public class GameHistory {
 	public void push(Snapshot snap) {
 		if (snap == null) throw new IllegalArgumentException("snapshot is null");
 
-		// persist individual snapshot (optional)
-		File dir = new File("snapshots");
-		if (!dir.exists()) dir.mkdirs();
-
-		File out = new File(dir, "snapshot_" + snap.getTimestamp() + ".ser");
-		try (FileOutputStream fos = new FileOutputStream(out);
-			 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-			oos.writeObject(snap);
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to persist snapshot", e);
-		}
-
 		history.push(snap);
-
-		// persist entire history stack for this game
-		saveStackToDisk();
+		saveStack();
 	}
 
 	public Snapshot pop() {
@@ -56,30 +41,31 @@ public class GameHistory {
 		return history.size();
 	}
 
-	private File historyFile() {
-		File dir = new File("histories");
+	private void saveStack() {
+		File dir = new File("saves");
 		if (!dir.exists()) dir.mkdirs();
-		return new File(dir, "history_" + gameId + ".ser");
-	}
+		File f = new File(dir, gameId + ".sav");
 
-	private void saveStackToDisk() {
-		File f = historyFile();
+		//serializujemy nasz stack do pliku
 		try (FileOutputStream fos = new FileOutputStream(f);
 			 ObjectOutputStream oos = new ObjectOutputStream(fos)) {
 			oos.writeObject(history);
 		} catch (IOException e) {
-			throw new RuntimeException("Failed to persist history stack", e);
+			throw new RuntimeException("nie udało się zapisać gry", e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	public static GameHistory loadFromFile(File f) {
 		if (f == null || !f.exists()) return null;
-		// parse gameId from filename history_<id>.ser
-		String name = f.getName();
-		if (!name.startsWith("history_") || !name.endsWith(".ser")) return null;
-		String gameId = name.substring("history_".length(), name.length() - ".ser".length());
 
+		String name = f.getName();
+		String suffix = ".sav";
+
+		if (!name.endsWith(suffix)) return null;
+		String gameId = name.substring(0, name.length() - suffix.length());
+
+		//odczytujemy obiekt z pliku i zwracamy odczytany stack
 		try (FileInputStream fis = new FileInputStream(f);
 			 ObjectInputStream ois = new ObjectInputStream(fis)) {
 			Object obj = ois.readObject();
@@ -88,7 +74,7 @@ public class GameHistory {
 			gh.history.addAll(stack);
 			return gh;
 		} catch (IOException | ClassNotFoundException e) {
-			throw new RuntimeException("Failed to load history from file", e);
+			throw new RuntimeException("nie udało się odczytać pliku", e);
 		}
 	}
 }
