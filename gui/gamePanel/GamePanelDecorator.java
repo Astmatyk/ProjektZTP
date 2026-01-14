@@ -1,18 +1,18 @@
 package gui.gamePanel;
 
-import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import javax.swing.JPanel;
 
 public abstract class GamePanelDecorator extends JPanel implements GamePanelInterface {
     protected GamePanelInterface wrappedPanel;
 
     public GamePanelDecorator(GamePanelInterface panel) {
         this.wrappedPanel = panel;
-        // Jeśli chcemy, aby dekorator przejął wygląd owiniętego panelu:
-        if (panel instanceof JPanel) {
-            this.setLayout(new BorderLayout());
-            this.add((JPanel)panel, BorderLayout.CENTER);
-        }
+        this.setLayout(new BorderLayout());
+        
+        // Musimy dodać panel do tego panelu (dekoratora)
+        // Zakładamy, że każdy GamePanelInterface jest też JPanelem
+        this.add((JPanel)wrappedPanel, BorderLayout.CENTER);
     }
 
     @Override

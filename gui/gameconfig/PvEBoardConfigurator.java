@@ -1,9 +1,9 @@
 package gui.gameconfig;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import javax.swing.*;
 
 public class PvEBoardConfigurator extends JPanel {
 
@@ -61,8 +61,6 @@ public class PvEBoardConfigurator extends JPanel {
         add(confirmButton, BorderLayout.SOUTH);
     }
 
-    /* ======================= PANEL STATKÓW ======================= */
-
     private void updateShipsPanel() {
         shipsPanel.removeAll();
 
@@ -80,8 +78,6 @@ public class PvEBoardConfigurator extends JPanel {
         shipsPanel.revalidate();
         shipsPanel.repaint();
     }
-
-    /* ======================= PANEL PLANSZY ======================= */
 
     private class BoardPanel extends JPanel {
 
@@ -205,8 +201,6 @@ public class PvEBoardConfigurator extends JPanel {
             return true;
         }
     }
-
-    /* ======================= GETTERY ======================= */
 
     public boolean[][] getPlayerBoard() {
         return playerBoard;
