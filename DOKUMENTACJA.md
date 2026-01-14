@@ -93,3 +93,36 @@ Docelowym zachowaniem jest opakowanie ConGamePanel w odpowiedni dekorator po wyb
 Dzięki użyciu Decoratora można oddzielić logikę poszczególnych trybów gry od siebie oraz umożliwć łatwiejsze ich dodawanie w przyszłości.
 
 **UWAGA! Ten wzorzec nie został jeszcze zrealizowany. W kodzie istnieje tylko jego szkielet.**  
+
+## Observer
+
+** Cel użycia ** 
+
+Wzorzec Observer został użyty  w celu wprowadzenia systemu osiągnięć aktualizowanego na bierząco bez wprowadzania dodatkowych funkcjonalności donklasy game
+
+** Role wzorca w projekcie ** 
+
+Obiekt obserwowany: Game, AchievementManager
+Interfejs obiektu obserwującego: GameListener
+Klasa abstrakcyjna: Achievement
+Obiekt obserwujący: AchievementManager, ConcreteAchievements: WinOneGame, LoseOneGame, ShootFiveShots, MissTenTimes
+
+** Lokalizacja w kodzie **
+
+gamelogic/achievements/Achievement.java
+gamelogic/achievements/AchievementManager.java
+gamelogic/achievements/WinOneGame.java
+gamelogic/achievements/LoseOneGame.java
+gamelogic/achievements/ShootFiveShots.java
+gamelogic/achievements/MissTenTimes.java
+gamelogic/Game.java
+gamelogic/GameListener.java
+
+** Użycie ** 
+
+Obiekt obserwowany Game wywołuje metodę notify, gdy zdarzy się jakieś zdarzenie informując o nim obiekt obserwowujący AchievementManager, który następnie informuje swoje obiekty informujące którymi są konkretne osiągnięcia, jeśli wydarzenie spełnia warunki na odblokowanie osiągnięcia zostaje wywołana metoda unlock która to osiągnięcie odblokowuje
+
+** Wektor zmian **
+
+Użycie wzorca observer pozwala implementację automatycznie auktalizujących się osiągnięć nie zostawiając negatywnego wplywu na przejrzystość kodu
+
