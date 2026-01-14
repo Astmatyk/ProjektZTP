@@ -38,3 +38,30 @@ Po każdym strzale originator wywołuje funkcję save(), która tworzy snapshot 
 
 **Wektor zmian**  
 Użycie wzorca zwiększa modularność projektu i upraszcza działanie kluczowej klasy Game, oddelegowując zadania związane z zarządzaniem historią rozgrywki do osobnych klas.
+
+
+## STRATEGY
+
+**Cel użycia**  
+Wzorzec Strategy został użyty do oddzielenia logiki wybory strzału od klasy gracza. 
+Dzięki temu różne poziomy trudności bota (Easy, Normal, Hard) mogą używać zupełnie innych algorytmów strzelania bez zmiany kodu Playera, Game, ani żadnych innych klas.
+Innymi słowy- zmienia zachowanie Playera bez wprowadzania zmian w samym Playerze.
+
+**Role wzorca w projekcie**  
+Strategy (interfejs): ShootingStrategy  
+Concrete Strategy: EasyMode, NormalMode, HardMode  
+Context: PcPLayer  
+Client: GameBuilderPvE, GameBuilderEvE
+
+**Lokalizacja w kodzie**  
+Definicja wzorca: gamelogic/ShootingStrategy.java  
+Implementacje: gamelogic/EasyMode.java, NormalMode.java, HardMode.java  
+Context: gamelogic/PcPlayer.java
+Client: gamelogic/GameBuilderPvE.java, gamelogic/GameBuilderEvE.java  
+
+**Użycie**  
+GameBuilder na podstawie BotDifficulty wybiera odpowiednią strategię, która jest przekazywana do konstruktora PcPlayer.
+Podczas tuty gry, PcPlayer.chooseCoordinates() deleguje wybór strzału do obiektu strategii. Strategia analizuje shootingBoard, wybiera koordynaty do zestrzelenia i je zwraca.
+
+**Wektor zmian**  
+Dzięki użyciu Strategy można m. in. dodawać nowe poziomy AI bez naruszania Playera czy Game, testować algorytmy strzelania w izolacji, czy też umożliwić zmianę poziomu trudności w trakcie rozgrywki jesli zaszła by na to potrzeba.
