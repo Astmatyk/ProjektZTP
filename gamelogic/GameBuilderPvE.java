@@ -53,11 +53,6 @@ public class GameBuilderPvE implements GameBuilder {
     public Game getResult() {
         return getResult(null); // null => Game samo wygeneruje ID
     }
-
-    @Override
-    public Game getResult() {
-        return getResult(null); // null => Game samo wygeneruje ID
-    }
     
     @Override
     public Game getResult(String gameId) {
