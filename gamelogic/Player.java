@@ -2,9 +2,9 @@ package gamelogic;
 
 import gamelogic.enums.MapFlags;
 import gamelogic.enums.ShotResult;
+import java.io.Serializable;
 
-public abstract class Player {
-
+public abstract class Player implements Serializable {
     protected Board ownBoard;
     protected Board shootingBoard;
 

@@ -36,7 +36,7 @@ public class MainGUI {
         // Przekazujemy 'this' (MainGUI), aby panele mogły wysyłać sygnały do zmiany widoku
         cardContainer.add(new MainPanel(this), "MENU");
         cardContainer.add(new GameConfigPanel(this), "GAME_CONFIG");
-        cardContainer.add(new ConGamePanel(), "GAME");
+        cardContainer.add(new ConGamePanel(this), "GAME");
         cardContainer.add(new AchievementPanel(this), "ACHIEVEMENT");
         cardContainer.add(new RankingPanel(this), "RANKING");
 
