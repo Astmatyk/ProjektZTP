@@ -21,8 +21,27 @@ public class GameBuilderEvE implements GameBuilder {
     public void buildBoard() {
         board1 = new Board(mapSize);
         board2 = new Board(mapSize);
+        
+        placeShipsRandomly(board1);
+        placeShipsRandomly(board2);
     }
 
+    private void placeShipsRandomly(Board board) {
+        int[] shipLengths = {5, 4, 3, 3, 2}; 
+        for (int length : shipLengths) {
+            boolean placed = false;
+            while (!placed) {
+                int x = (int)(Math.random() * board.getSize());
+                int y = (int)(Math.random() * board.getSize());
+                Board.Direction dir = Board.Direction.values()[(int)(Math.random() * 4)];
+                Board.PlaceResult result = board.placeShip(x, y, length, dir);
+                if (result == Board.PlaceResult.OK) {
+                    placed = true;
+                }
+            }
+        }
+    }
+    
     @Override
     public void buildPlayers() {
         if (board1 == null || board2 == null) {
