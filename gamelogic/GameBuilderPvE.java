@@ -26,6 +26,24 @@ public class GameBuilderPvE implements GameBuilder {
     public void buildBoard() {
         board1 = MapGenerator.fromLayout(mapSize, playerLayout);
         board2 = new Board(mapSize);
+        
+        placeShipsRandomly(board2);
+    }
+    
+    private void placeShipsRandomly(Board board) {
+        int[] shipLengths = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1}; 
+        for (int length : shipLengths) {
+            boolean placed = false;
+            while (!placed) {
+                int x = (int)(Math.random() * board.getSize());
+                int y = (int)(Math.random() * board.getSize());
+                Board.Direction dir = Board.Direction.values()[(int)(Math.random() * 4)];
+                Board.PlaceResult result = board.placeShip(x, y, length, dir);
+                if (result == Board.PlaceResult.OK) {
+                    placed = true;
+                }
+            }
+        }
     }
 
     @Override
