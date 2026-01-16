@@ -23,7 +23,6 @@ public abstract class Player implements Serializable {
     // Aktualizacja własnego shootingBoard na podstawie wyniku strzalu
     public void updateShootingBoard(Coordinates coords, ShotResult result) {
         switch (result) {
-            //krytyczny fix
             case MISS -> shootingBoard.setFlag(MapFlags.NO_SHIP, coords.x, coords.y);
             case HIT, SINK -> shootingBoard.setFlag(MapFlags.SHIP_WRECKED, coords.x, coords.y);
         }
