@@ -1,10 +1,17 @@
 package gui;
 
+import gamelogic.AudioManager;
 import java.awt.*;
 import javax.swing.*;
 
 public class MainPanel extends GuiPanel {
+    private AudioManager audioManager;
+
     public MainPanel(MainGUI parent) {
+        // Inicjalizuj AudioManager i odtwórz muzykę
+        audioManager = new AudioManager();
+        audioManager.playAudioLoop("background.wav");
+
         // panelem menu jest gridbag z przyciskami
         this.setLayout(new GridBagLayout());
 
