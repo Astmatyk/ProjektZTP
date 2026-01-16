@@ -24,7 +24,8 @@ public abstract class Player implements Serializable {
     public void updateShootingBoard(Coordinates coords, ShotResult result) {
         switch (result) {
             case MISS -> shootingBoard.setFlag(MapFlags.NO_SHIP, coords.x, coords.y);
-            case HIT, SINK -> shootingBoard.setFlag(MapFlags.SHIP_WRECKED, coords.x, coords.y);
+            case HIT -> shootingBoard.setFlag(MapFlags.SHIP_WRECKED, coords.x, coords.y);
+            case SINK -> shootingBoard.markSunkShip(coords.x, coords.y);
         }
     }
 
