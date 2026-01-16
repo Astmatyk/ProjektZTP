@@ -16,11 +16,11 @@ public class GameBuilderPvE implements GameBuilder {
     private Player player2;
 
     //Tymczasowy konstrukto
-    public GameBuilderPvE(int mapSize, String humanName, BotDifficulty difficulty, boolean[][] playerLayout) {
+    public GameBuilderPvE(int mapSize, String player1Name, String player2Name, boolean[][] p1Layout, boolean[][] p2Layout, BotDifficulty difficulty) {
         this.mapSize = mapSize;
-        this.humanName = humanName;
+        this.humanName = player1Name;
         this.difficulty = difficulty;
-        this.playerLayout = playerLayout;
+        this.playerLayout = p1Layout;
     }
 
     @Override

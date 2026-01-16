@@ -1,17 +1,15 @@
 package gui;
-
-import gui.gameconfig.*;
 import java.awt.*;
-import java.util.Arrays;
 import javax.swing.*;
 
-import gamelogic.GameBuilder;
-import gamelogic.GameBuilderPvP;
+import gui.gameconfig.*;
+import gamelogic.*;
+import gamelogic.enums.*;;
 
 public class GameConfigPanel extends JPanel {
-    String modeFlag = "PVP";         // globalny tryb gry
-    String difficultyFlag = "NORMAL"; // globalny poziom trudności
-    int mapSize;                // globalny rozmiar planszy
+    String modeFlag = "PVP";         
+    BotDifficulty difficultyFlag = BotDifficulty.NORMAL; // Zmiana na typ enum
+    int mapSize;                
     boolean boardsConfigured = false; 
     JButton playButton;
 
@@ -121,10 +119,10 @@ public class GameConfigPanel extends JPanel {
         pvc.addActionListener(e -> { modeFlag = "PVE"; updateUIState(easy, normal, hard, diffLabel, configBoardButton, pvp, pvc); });
         cvc.addActionListener(e -> { modeFlag = "EVE"; updateUIState(easy, normal, hard, diffLabel, configBoardButton, pvp, pvc); });
 
-        // Listenery Trudności
-        easy.addActionListener(e -> difficultyFlag = "EASY");
-        normal.addActionListener(e -> difficultyFlag = "NORMAL");
-        hard.addActionListener(e -> difficultyFlag = "HARD");
+        // Listenery Trudności - użycie ENUM
+        easy.addActionListener(e -> difficultyFlag = BotDifficulty.EASY);
+        normal.addActionListener(e -> difficultyFlag = BotDifficulty.NORMAL);
+        hard.addActionListener(e -> difficultyFlag = BotDifficulty.HARD);
 
         // Rozmiar mapy
         Runnable updateMapSettings = () -> mapSize = sizeTen.isSelected() ? 10 : sizeTwenty.isSelected() ? 20 : 30;
@@ -154,6 +152,7 @@ public class GameConfigPanel extends JPanel {
                     board2 = configurator.getBoards().get(1);
                     boardsConfigured = true;
                     updatePlayButtonState();
+                    gameBuilder = new GameBuilderPvE(mapSize, nick1, nick2, board1, board2, difficultyFlag);
                 }
             }
         });
@@ -164,15 +163,17 @@ public class GameConfigPanel extends JPanel {
                 board1 = configurator.getBoards().get(0);
                 board2 = configurator.getBoards().get(1);
                 boardsConfigured = true;
+                //gameBuilder = new GameBuilderEvE(mapSize, difficultyFlag, board1, board2);
             }
             
             nick1 = firstText.getText();
             nick2 = secondText.getText();
-            test(); // Debug info w konsoli
+            test(); 
+            
+            // Przekazanie flagi trudności do mainGUI
             mainGUI.launchGame(mapSize, modeFlag, nick1, nick2);
         });
 
-        // Inicjalizacja stanów
         updateUIState(easy, normal, hard, diffLabel, configBoardButton, pvp, pvc);
     }
 
@@ -196,6 +197,5 @@ public class GameConfigPanel extends JPanel {
     private void test() {
         System.out.println("--- TEST KONFIGURACJI ---");
         System.out.println("Tryb: " + modeFlag + " | Trudność: " + difficultyFlag + " | Rozmiar: " + mapSize);
-        System.out.println("P1: " + nick1 + " | P2: " + nick2);
     }
 }
