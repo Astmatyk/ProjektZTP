@@ -7,6 +7,7 @@ public class PvEBoardConfigurator extends BoardConfiguratorAbstract {
 
     public PvEBoardConfigurator(int size) {
         super(size);
+        System.out.println("Initializing PvE Configurator...");
         
         // 1. Losujemy statki dla komputera (P2)
         this.player2Board = placeRandomFleet(size);

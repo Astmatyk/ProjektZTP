@@ -8,6 +8,7 @@ public class PvPBoardConfigurator extends BoardConfiguratorAbstract {
 
     public PvPBoardConfigurator(int size) {
         super(size);
+        System.out.println("Initializing PvP Configurator...");
         initRemainingShips();
         
         // Budujemy interfejs dla pierwszego gracza

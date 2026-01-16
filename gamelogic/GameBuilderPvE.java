@@ -15,6 +15,7 @@ public class GameBuilderPvE implements GameBuilder {
     private Player player1;
     private Player player2;
 
+    //Tymczasowy konstrukto
     public GameBuilderPvE(int mapSize, String humanName, BotDifficulty difficulty, boolean[][] playerLayout) {
         this.mapSize = mapSize;
         this.humanName = humanName;
