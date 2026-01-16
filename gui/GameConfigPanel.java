@@ -17,6 +17,7 @@ public class GameConfigPanel extends JPanel {
     boolean[][] board1, board2;
 
     GameBuilder gameBuilder;
+    Game game;
 
     public GameConfigPanel(MainGUI mainGUI) {
         //------------------------------------------------Ustawienia okna------------------------------------------------
@@ -33,11 +34,11 @@ public class GameConfigPanel extends JPanel {
 
         JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JRadioButton pvp = new JRadioButton("Gracz vs Gracz", true);
-        pvp.setEnabled(false);
+        pvp.setEnabled(true);
         JRadioButton pvc = new JRadioButton("Gracz vs Komputer");
-        pvc.setEnabled(false);
+        pvc.setEnabled(true);
         JRadioButton cvc = new JRadioButton("Komputer vs Komputer");
-        cvc.setEnabled(false);
+        cvc.setEnabled(true);
 
         ButtonGroup modeGroup = new ButtonGroup();
         modeGroup.add(pvp); modeGroup.add(pvc); modeGroup.add(cvc);
@@ -70,9 +71,9 @@ public class GameConfigPanel extends JPanel {
 
         JPanel boardSetPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
         JRadioButton sizeTen = new JRadioButton("10x10", true);
-        sizeTen.setEnabled(false);
+        sizeTen.setEnabled(true);
         JRadioButton sizeTwenty = new JRadioButton("20x20");
-        sizeTwenty.setEnabled(false);
+        sizeTwenty.setEnabled(true);
         JRadioButton sizeThirty = new JRadioButton("30x30");
 
         ButtonGroup sizeGroup = new ButtonGroup();
@@ -174,9 +175,12 @@ public class GameConfigPanel extends JPanel {
             nick1 = firstText.getText();
             nick2 = secondText.getText();
             test(); 
+
+            game = gameBuilder.getResult();
+
             
             // Przekazanie flagi trudności do mainGUI
-            mainGUI.launchGame(mapSize, modeFlag, nick1, nick2);
+            mainGUI.launchGame(mapSize, modeFlag, nick1, nick2, game);
         });
 
         updateUIState(easy, normal, hard, diffLabel, configBoardButton, pvp, pvc);
