@@ -17,3 +17,6 @@ desktop.ini
 
 # class
 **/*.class
+
+# saves
+/saves/
