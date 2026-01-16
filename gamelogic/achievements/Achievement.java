@@ -1,5 +1,5 @@
 package gamelogic.achievements;
-import gamelogic.Event;
+import gamelogic.GameEvent;
 public abstract class Achievement {
 private boolean unlocked=false;
 
@@ -9,6 +9,6 @@ public boolean isUnlocked() {
 public void unlock() {
         if(!unlocked) unlocked=true;
 }
-public void update(Event event) {}
+public void update(GameEvent event) {}
 
 }

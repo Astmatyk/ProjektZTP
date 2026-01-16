@@ -11,7 +11,7 @@ public class AchievementManager implements GameListener {
     {
         achievements.add(achievement);
     }
-    @Override public void update(Event event) {
+    @Override public void update(GameEvent event) {
         for (Achievement achievement : achievements) {
             achievement.update(event);
         }

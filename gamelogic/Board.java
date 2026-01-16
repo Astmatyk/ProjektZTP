@@ -2,6 +2,8 @@ package gamelogic;
 
 import gamelogic.enums.*;
 import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Board implements Serializable {
     private int size;
@@ -131,9 +133,12 @@ public class Board implements Serializable {
 
             case SHIP -> {
                 cells[y][x] = MapFlags.SHIP_WRECKED;
-                return isShipSunkAt(x, y)
-                        ? ShotResult.SINK
-                        : ShotResult.HIT;
+                if(isShipSunkAt(x, y)) {
+                	markSunkShip(x, y);
+                	return ShotResult.SINK;
+                }
+                else
+                 	return ShotResult.HIT;
             }
 
             case SHIP_WRECKED -> {
@@ -198,6 +203,47 @@ public class Board implements Serializable {
         return true;
     }
 
+    public void markSunkShip(int x, int y) {
+    	setFlag(MapFlags.SHIP_WRECKED, x, y);
+        List<Coordinates> segments = getShipCoordinates(x, y);
+        
+        for (Coordinates c : segments) {
+
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dx = -1; dx <= 1; dx++) {
+                    int sx = c.x + dx;
+                    int sy = c.y + dy;
+
+                    if (!inBounds(sx, sy)) continue;
+                    if (cells[sy][sx] == MapFlags.NOTHING) {
+                        cells[sy][sx] = MapFlags.NO_SHIP;
+                    }
+                }
+            }
+        }
+    }
+
+    public List<Coordinates> getShipCoordinates(int x, int y) {
+        List<Coordinates> result = new ArrayList<>();
+        boolean[][] visited = new boolean[size][size];
+        dfs(x, y, result, visited);
+        return result;
+    }
+
+    private void dfs(int x, int y, List<Coordinates> result, boolean[][] visited) {
+        if (!inBounds(x, y)) return;
+        if (visited[y][x]) return;
+        if (cells[y][x] != MapFlags.SHIP_WRECKED) return;
+
+        visited[y][x] = true;
+        result.add(new Coordinates(x, y));
+
+        dfs(x+1, y, result, visited);
+        dfs(x-1, y, result, visited);
+        dfs(x, y+1, result, visited);
+        dfs(x, y-1, result, visited);
+    }
+    
     private boolean isShipPart(int x, int y) {
         if (!inBounds(x, y)) return false;
         return cells[y][x] == MapFlags.SHIP || cells[y][x] == MapFlags.SHIP_WRECKED;
