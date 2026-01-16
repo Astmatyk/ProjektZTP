@@ -28,6 +28,7 @@ public class ConGamePanel extends JPanel implements GameListener {
     private boolean isPvP = true;
     private boolean isEvE = true;
     private int mapSize = 10;
+    private int opponentDelay = 200;
 
     public ConGamePanel(MainGUI mainGUI) {
         this.mainGUI = mainGUI;
@@ -48,6 +49,13 @@ public class ConGamePanel extends JPanel implements GameListener {
         sizeBox.setSelectedItem(mapSize);
         sizeBox.addActionListener(e -> mapSize = (Integer)sizeBox.getSelectedItem());
 
+        JSlider delaySlider = new JSlider(JSlider.HORIZONTAL, 50, 2000, 200);
+        delaySlider.setMajorTickSpacing(500);
+        delaySlider.setMinorTickSpacing(50);
+        delaySlider.setPaintTicks(true);
+        delaySlider.setPaintLabels(true);
+        delaySlider.addChangeListener(e -> opponentDelay = delaySlider.getValue());
+
         JButton startBtn = new JButton("Nowa gra");
         startBtn.addActionListener(e -> startGame());
 
@@ -58,6 +66,8 @@ public class ConGamePanel extends JPanel implements GameListener {
         topPanel.add(modeBox);
         topPanel.add(new JLabel("Rozmiar:"));
         topPanel.add(sizeBox);
+        topPanel.add(new JLabel("Retardacja przeciwnika:"));
+        topPanel.add(delaySlider);
         topPanel.add(startBtn);
         topPanel.add(backButton);
 
@@ -209,7 +219,7 @@ public class ConGamePanel extends JPanel implements GameListener {
     }
 
     private void schedulePcMove() {
-        Timer t = new Timer(50, null);
+        Timer t = new Timer(opponentDelay, null);
         t.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -235,7 +245,7 @@ public class ConGamePanel extends JPanel implements GameListener {
                 }
             }
         });
-        t.setInitialDelay(200);
+        t.setInitialDelay(opponentDelay);
         t.start();
     }
 
