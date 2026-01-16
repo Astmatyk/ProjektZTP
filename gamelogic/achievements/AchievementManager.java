@@ -6,7 +6,12 @@ import gamelogic.GameListener;
 
 public class AchievementManager implements GameListener {
     private final List<Achievement> achievements = new ArrayList<>();
-    public void AchievementManager() {}
+    public void AchievementManager() {
+        achievements.add(new LoseOneGame());
+        achievements.add(new MissTenTimes());
+        achievements.add(new WinOneGame());
+        achievements.add(new ShootFiveShips());
+    }
     public void addAchievement(Achievement achievement)
     {
         achievements.add(achievement);

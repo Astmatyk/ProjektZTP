@@ -27,6 +27,7 @@ public class Game {
         this.currentPlayer = p1;
         this.gameId = gameId != null ? gameId : String.valueOf(System.currentTimeMillis());
         this.history = new GameHistory(this.gameId);
+        this.listenersList.add(new AchievementManager());
     }
 
     public Player getOpponent(Player p) {
