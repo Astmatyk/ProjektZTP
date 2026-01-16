@@ -3,6 +3,9 @@ package gamelogic;
 import gamelogic.enums.*;
 import java.io.Serializable;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class Board implements Serializable {
     private int size;
     private MapFlags[][] cells;
@@ -197,7 +200,56 @@ public class Board implements Serializable {
 
         return true;
     }
+    
+    public void markSunkShip(int x, int y) {
+        List<Coordinates> segments = getShipCoordinates(x, y);
 
+        for (Coordinates c : segments) {
+            setFlag(MapFlags.SHIP_WRECKED, c.x, c.y);
+
+            for (int dy = -1; dy <= 1; dy++) {
+                for (int dx = -1; dx <= 1; dx++) {
+                    int sx = c.x + dx;
+                    int sy = c.y + dy;
+
+                    if (!inBounds(sx, sy)) continue;
+                    if (cells[sy][sx] == MapFlags.NOTHING) {
+                        cells[sy][sx] = MapFlags.NO_SHIP;
+                    }
+                }
+            }
+        }
+    }
+
+    public List<Coordinates> getShipCoordinates(int x, int y) {
+        List<Coordinates> result = new ArrayList<>();
+
+        if (!isShipPart(x, y)) return result;
+
+        result.add(new Coordinates(x, y));
+
+        // poziomo
+        collectDirection(result, x, y, 1, 0);
+        collectDirection(result, x, y, -1, 0);
+
+        // pionowo
+        collectDirection(result, x, y, 0, 1);
+        collectDirection(result, x, y, 0, -1);
+
+        return result;
+    }
+    
+    private void collectDirection(List<Coordinates> list, int x, int y, int dx, int dy) {
+        int cx = x + dx;
+        int cy = y + dy;
+
+        while (inBounds(cx, cy) && isShipPart(cx, cy)) {
+            list.add(new Coordinates(cx, cy));
+            cx += dx;
+            cy += dy;
+        }
+    }
+    
     private boolean isShipPart(int x, int y) {
         if (!inBounds(x, y)) return false;
         return cells[y][x] == MapFlags.SHIP || cells[y][x] == MapFlags.SHIP_WRECKED;
