@@ -1,6 +1,10 @@
 package gui.gamePanel;
 
+import gamelogic.Game;
+
 public class EvEGamePanel extends GamePanelDecorator {
+    GamePanelInterface wrappe;
+
     public EvEGamePanel(GamePanelInterface panel) {
         super(panel);
         System.out.println("EvE Game Panel Behavior");
@@ -8,7 +12,10 @@ public class EvEGamePanel extends GamePanelDecorator {
 
     @Override
     public void display() {
-        
-        super.display();
+        wrappe.display();
+    }
+
+    public void bindGame(Game game){
+        wrappe.bindGame(game);
     }
 }

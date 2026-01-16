@@ -1,6 +1,9 @@
 package gui.gamePanel;
 
+import gamelogic.Game;
+
 public class PvPGamePanel extends GamePanelDecorator {
+    GamePanelInterface wrappe;
 
     public PvPGamePanel(GamePanelInterface panel) {
         super(panel);
@@ -9,6 +12,10 @@ public class PvPGamePanel extends GamePanelDecorator {
 
     @Override
     public void display() {
-        super.display();
+        wrappe.display();
+    }
+
+    public void bindGame(Game game){
+        wrappe.bindGame(game);
     }
 }

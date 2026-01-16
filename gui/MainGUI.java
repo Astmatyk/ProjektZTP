@@ -5,6 +5,7 @@ import gui.gamePanel.EvEGamePanel;
 import gui.gamePanel.GamePanelInterface;
 import gui.gamePanel.PvEGamePanel;
 import gui.gamePanel.PvPGamePanel;
+import gamelogic.Game;
 import java.awt.*;
 import javax.swing.*;
 
@@ -60,25 +61,28 @@ public class MainGUI {
         cardLayout.show(cardContainer, viewName);
     }
 
-    public void launchGame(int boardSize, String mode, String p1Name, String p2Name) {
+    public void launchGame(int boardSize, String mode, String p1Name, String p2Name, Game game) {
     // 1. Tworzymy bazę (Core)
-    GamePanelInterface game = new ConGamePanel(this, boardSize, p1Name, p2Name);
+    GamePanelInterface gamePanel = new ConGamePanel(this, boardSize, p1Name, p2Name);
 
     // 2. Dekorujemy w zależności od trybu
     switch(mode){
         case "PVP":
-            game = new PvPGamePanel(game);
+            gamePanel = new PvPGamePanel(gamePanel);
+            gamePanel.bindGame(game);
             break;
         case "PVE":
-            game = new PvEGamePanel(game);
+            gamePanel = new PvEGamePanel(gamePanel);
+            gamePanel.bindGame(game);
             break;
         case "EVE":
-            game = new EvEGamePanel(game);
+            gamePanel = new EvEGamePanel(gamePanel);
+            gamePanel.bindGame(game);
             break;
     }
     
     // 3. Dodajemy do UI (rzutujemy na JPanel, bo cardContainer tego wymaga)
-    cardContainer.add((JPanel)game, "GAME");
+    cardContainer.add((JPanel)gamePanel, "GAME");
     
     cardContainer.revalidate();
     cardContainer.repaint();
