@@ -25,6 +25,8 @@ public class ConGamePanel extends JPanel implements GameListener {
     private Player humanPlayer;
     private Player opponent;
     private boolean isPvE = true;
+    private boolean isPvP = true;
+    private boolean isEvE = true;
     private int mapSize = 10;
 
     public ConGamePanel(MainGUI mainGUI) {
@@ -35,8 +37,13 @@ public class ConGamePanel extends JPanel implements GameListener {
         String[] modes = new String[]{"PvE","PvP","EvE"};
         JComboBox<String> modeBox = new JComboBox<>(modes);
         modeBox.addActionListener(e -> isPvE = modeBox.getSelectedItem().equals("PvE"));
+        modeBox.addActionListener(e -> isPvP = modeBox.getSelectedItem().equals("PvP"));
+        modeBox.addActionListener(e -> isEvE = modeBox.getSelectedItem().equals("EvE"));
+        isPvE = modeBox.getSelectedItem().equals("PvE");
+        isPvP = modeBox.getSelectedItem().equals("PvP");
+        isEvE = modeBox.getSelectedItem().equals("EvE");
 
-        Integer[] sizes = new Integer[]{8,10,12};
+        Integer[] sizes = new Integer[]{10,15,20};
         JComboBox<Integer> sizeBox = new JComboBox<>(sizes);
         sizeBox.setSelectedItem(mapSize);
         sizeBox.addActionListener(e -> mapSize = (Integer)sizeBox.getSelectedItem());
@@ -150,12 +157,16 @@ public class ConGamePanel extends JPanel implements GameListener {
 
         placeRandomFleet(b1);
         placeRandomFleet(b2);
-
-        humanPlayer = new PcPlayer(b1, new Board(mapSize), new HardMode());
-        if (isPvE) {
-            opponent = new PcPlayer(b2, new Board(mapSize), new HardMode());
+        System.out.println("PvE = "+isPvE+"; PvP = "+isPvP+"; EvE = "+isEvE);
+        if(!isEvE) {
+            humanPlayer = new HumanPlayer(b1, new Board(mapSize), "Player");
         } else {
+            humanPlayer = new PcPlayer(b1, new Board(mapSize), new HardMode());
+        }
+        if (isPvP) {
             opponent = new HumanPlayer(b2, new Board(mapSize), "Player2");
+        } else {
+            opponent = new PcPlayer(b2, new Board(mapSize), new HardMode());
         }
 
         game = new Game(humanPlayer, opponent);
@@ -198,7 +209,7 @@ public class ConGamePanel extends JPanel implements GameListener {
     }
 
     private void schedulePcMove() {
-        Timer t = new Timer(300, null);
+        Timer t = new Timer(50, null);
         t.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
