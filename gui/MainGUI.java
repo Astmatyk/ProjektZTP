@@ -10,7 +10,7 @@ public class MainGUI {
     private CardLayout cardLayout;
 
     public MainGUI() {
-        frame = new JFrame("FigureDrawer");
+        frame = new JFrame("Gra w statki. Aplikacja pozwala na rozgrywkę między dwoma graczami lub z komputerem. Grający rozmieszczają swoje floty na planszy (zgodnie z zasadami gry), a następnie na przemian oddają strzały, próbując zatopić wszystkie statki przeciwnika. Gra oferuje tryb standardowy z określonymi zasadami (np. rozmiary planszy, typy statków) oraz prostą logikę komputerowego przeciwnika, która może być rozbudowana o różne poziomy trudności. Aplikacja zachowuje historię rozgrywek, pozwalając na przeglądanie statystyk, w tym rankingu graczy. Gra oferuje personalizację wyglądu planszy i statków, system osiągnięć oraz odblokowywanie dodatkowej zawartości (np. nowych wzorów statków, trybów gry). Tryb symulacji pozwala obserwować grę komputera przeciwko samemu sobie.");
         // Pobieramy URL do zasobu
         java.net.URL iconURL = getClass().getResource("graphics/logo.png");
 
