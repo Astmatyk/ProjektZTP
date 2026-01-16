@@ -5,9 +5,11 @@ public class GameBuilderPvE implements GameBuilder {
 
     private final int mapSize;
     private final String humanName;
+    private final String botName;
     private final BotDifficulty difficulty;
 
     private final boolean[][] playerLayout;
+    private final boolean[][] botLayout;
 
     private Board board1;
     private Board board2;
@@ -19,18 +21,19 @@ public class GameBuilderPvE implements GameBuilder {
     public GameBuilderPvE(int mapSize, String player1Name, String player2Name, boolean[][] p1Layout, boolean[][] p2Layout, BotDifficulty difficulty) {
         this.mapSize = mapSize;
         this.humanName = player1Name;
+        this.botName = player2Name;
         this.difficulty = difficulty;
         this.playerLayout = p1Layout;
+        this.botLayout = p2Layout;
     }
 
     @Override
     public void buildBoard() {
         board1 = MapGenerator.fromLayout(mapSize, playerLayout);
-        board2 = new Board(mapSize);
-        
-        placeShipsRandomly(board2);
+        board2 = MapGenerator.fromLayout(mapSize, botLayout);
     }
     
+    /*
     private void placeShipsRandomly(Board board) {
         int[] shipLengths = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1}; 
         for (int length : shipLengths) {
@@ -45,15 +48,13 @@ public class GameBuilderPvE implements GameBuilder {
                 }
             }
         }
-    }
+    } */
 
     @Override
     public void buildPlayers() {
         if (board1 == null || board2 == null) {
             throw new IllegalStateException("Najpierw buildBoard()");
         }
-
-
 
         ShootingStrategy strategy = switch (difficulty) {
             case EASY -> new EasyMode();
