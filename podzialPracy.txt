@@ -1,0 +1,19 @@
+Filip Kamiński i Michał Spaliński:
+-Board, Game
+-Builder: GameBuilder, GameBuilderPvP, GameBuilderPvE, GameBuilderEvE
+
+Samuel Chodorowski:
+-GUI, 
+-Decorator:
+
+Robert Tomala:
+-GUI, Game
+-Memento: Snapshot, GameHistory
+
+Marcin Lenkiewicz:
+-Player, PcPlayer, HumanPlayer, Game
+-Strategy: ShootingStrategy, EasyMode, NormalMode, HardMode
+
+Michał Wilczewski:
+-
+-Observer: 
