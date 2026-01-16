@@ -1,7 +1,7 @@
 package gamelogic.achievements;
 import java.util.List;
 import java.util.ArrayList;
-import gamelogic.Event;
+import gamelogic.GameEvent;
 import gamelogic.GameListener;
 
 public class AchievementManager implements GameListener {
