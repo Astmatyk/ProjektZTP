@@ -132,12 +132,16 @@ public class Board implements Serializable {
 
         switch (cells[y][x]) {
 
-            case SHIP -> {
-                cells[y][x] = MapFlags.SHIP_WRECKED;
-                return isShipSunkAt(x, y)
-                        ? ShotResult.SINK
-                        : ShotResult.HIT;
-            }
+	        case SHIP -> {
+	            cells[y][x] = MapFlags.SHIP_WRECKED;
+	            if(isShipSunkAt(x, y)) {
+	            	markSunkShip(x, y);
+	            	return ShotResult.SINK;
+	            }
+	            else
+	             	return ShotResult.HIT;
+	        }
+
 
             case SHIP_WRECKED -> {
                 // już trafione
@@ -202,10 +206,10 @@ public class Board implements Serializable {
     }
     
     public void markSunkShip(int x, int y) {
+    	setFlag(MapFlags.SHIP_WRECKED, x, y);
         List<Coordinates> segments = getShipCoordinates(x, y);
-
+        
         for (Coordinates c : segments) {
-            setFlag(MapFlags.SHIP_WRECKED, c.x, c.y);
 
             for (int dy = -1; dy <= 1; dy++) {
                 for (int dx = -1; dx <= 1; dx++) {
@@ -223,31 +227,23 @@ public class Board implements Serializable {
 
     public List<Coordinates> getShipCoordinates(int x, int y) {
         List<Coordinates> result = new ArrayList<>();
-
-        if (!isShipPart(x, y)) return result;
-
-        result.add(new Coordinates(x, y));
-
-        // poziomo
-        collectDirection(result, x, y, 1, 0);
-        collectDirection(result, x, y, -1, 0);
-
-        // pionowo
-        collectDirection(result, x, y, 0, 1);
-        collectDirection(result, x, y, 0, -1);
-
+        boolean[][] visited = new boolean[size][size];
+        dfs(x, y, result, visited);
         return result;
     }
-    
-    private void collectDirection(List<Coordinates> list, int x, int y, int dx, int dy) {
-        int cx = x + dx;
-        int cy = y + dy;
 
-        while (inBounds(cx, cy) && isShipPart(cx, cy)) {
-            list.add(new Coordinates(cx, cy));
-            cx += dx;
-            cy += dy;
-        }
+    private void dfs(int x, int y, List<Coordinates> result, boolean[][] visited) {
+        if (!inBounds(x, y)) return;
+        if (visited[y][x]) return;
+        if (cells[y][x] != MapFlags.SHIP_WRECKED) return;
+
+        visited[y][x] = true;
+        result.add(new Coordinates(x, y));
+
+        dfs(x+1, y, result, visited);
+        dfs(x-1, y, result, visited);
+        dfs(x, y+1, result, visited);
+        dfs(x, y-1, result, visited);
     }
     
     private boolean isShipPart(int x, int y) {
