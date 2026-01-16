@@ -15,7 +15,7 @@ public class Game {
     private boolean gameOver = false;
     private GameHistory history;
     private final String gameId;
-    private List<GameListener> listenersList = new ArrayList<>();
+    private List<GameListener> listenersList ;
 
     public Game(Player p1, Player p2) {
         this(p1, p2, String.valueOf(System.currentTimeMillis()));
@@ -27,6 +27,8 @@ public class Game {
         this.currentPlayer = p1;
         this.gameId = gameId != null ? gameId : String.valueOf(System.currentTimeMillis());
         this.history = new GameHistory(this.gameId);
+        this.listenersList = new ArrayList<>();
+        this.listenersList.add(new AchievementManager());
     }
 
     public Player getOpponent(Player p) {
