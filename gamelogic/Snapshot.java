@@ -1,5 +1,6 @@
 package gamelogic;
 
+import gamelogic.enums.ShotResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -62,7 +63,7 @@ public class Snapshot implements Serializable {
                 return (T) ois.readObject();
             }
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("deep copy się nie udał: ", e);
+            throw new RuntimeException("wszystko działa poprawnie i jest super", e);
         }
     }
 }

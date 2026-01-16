@@ -1,6 +1,6 @@
 package gui;
 
-import gui.gameconfig.PvEBoardConfigurator;
+import gui.gameconfig.*;
 import java.awt.*;
 import javax.swing.*;
 
@@ -9,6 +9,9 @@ public class GameConfigPanel extends JPanel {
     int mapSize;            // globalny rozmiar planszy
     boolean boardsConfigured = false; // czy plansze zostały skonfigurowane (PvP/PvE)
     JButton playButton;
+
+    String nick1, nick2;
+    boolean board1[][], board2[][];
 
     public GameConfigPanel(MainGUI mainGUI) {
         //------------------------------------------------Ustawienia okna------------------------------------------------
@@ -149,27 +152,40 @@ public class GameConfigPanel extends JPanel {
 
         //Akcje przełącznika trybu gry
         configBoardButton.addActionListener(e -> {
-            if(modeFlag.equals("PVE")) {
-                PvEBoardConfigurator configurator = new PvEBoardConfigurator(mapSize);
-                int result = JOptionPane.showConfirmDialog(
-                        this,
-                        configurator,
-                        "Konfiguracja planszy - PvE",
-                        JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.PLAIN_MESSAGE
-                );
-                if(result==JOptionPane.OK_OPTION) {
-                    boolean[][] playerBoard = configurator.getPlayerBoard();
-                    boardsConfigured = true;
-                    updatePlayButtonState();
-                    System.out.println("Plansza gracza PvE:");
-                    printBoard(playerBoard);
-                    System.out.println("Plansza komputera PvE będzie generowana w Builderze");
+            switch(modeFlag){
+                case "PVP" -> {
+                    PvPBoardConfigurator configurator0 = new PvPBoardConfigurator(mapSize);
+                    int result0 = JOptionPane.showConfirmDialog(
+                            this,
+                            configurator0,
+                            "Konfiguracja planszy - PvE",
+                            JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.PLAIN_MESSAGE
+                    );
+                    if(result0==JOptionPane.OK_OPTION) {
+                        board1 = configurator0.getBoards().get(0);
+                        board2 = configurator0.getBoards().get(1);
+                        boardsConfigured = true;
+                        updatePlayButtonState();
+                    }
                 }
-            } else if(modeFlag.equals("PVP")) {
-                System.out.println("Tu uruchamiamy konfigurator PvP");
-                boardsConfigured=true;
-                updatePlayButtonState();
+                case "PVE" -> {
+                    PvEBoardConfigurator configurator1 = new PvEBoardConfigurator(mapSize);
+                    int result1 = JOptionPane.showConfirmDialog(
+                            this,
+                            configurator1,
+                            "Konfiguracja planszy - PvE",
+                            JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.PLAIN_MESSAGE
+                    );
+                    if(result1==JOptionPane.OK_OPTION) {
+                        board1 = configurator1.getBoards().get(0);
+                        board2 = configurator1.getBoards().get(1);
+                        boardsConfigured = true;
+                        updatePlayButtonState();
+                    }
+                }
+                default -> System.out.println("Błąd modeFlag!");
             }
         });
 
@@ -177,6 +193,11 @@ public class GameConfigPanel extends JPanel {
         playButton.addActionListener(e -> {
             if(modeFlag.equals("EVE")) {
                 System.out.println("Tworzę automatyczne plansze dla EvE");
+                EvEBoardConfigurator configurator2 = new EvEBoardConfigurator(mapSize);
+                board1 = configurator2.getBoards().get(0);
+                board2 = configurator2.getBoards().get(1);
+                boardsConfigured = true;
+                    updatePlayButtonState();
             } else if(!boardsConfigured) {
                 System.out.println("Najpierw skonfiguruj plansze!");
                 return;
@@ -186,10 +207,10 @@ public class GameConfigPanel extends JPanel {
 
             String p1 = firstText.getText();
             String p2 = secondText.getText();
-
+            test();
+            //Powinien być 
             mainGUI.launchGame(mapSize, modeFlag, p1, p2);
         });
-
         updatePlayButtonState();
     }
 
@@ -199,9 +220,23 @@ public class GameConfigPanel extends JPanel {
         else playButton.setEnabled(boardsConfigured);
     }
 
-    private void printBoard(boolean[][] board){
-        for(boolean[] row:board){
-            for(boolean cell:row) System.out.print(cell?"S ":" .");
+    private void test(){
+        System.out.println("Tryb gry: "+modeFlag);
+        System.out.println("Rozmiar mapy: "+mapSize);
+
+        System.out.println("Nick 1:"+nick1);
+        for (boolean[] row : board1) {
+            for (boolean cell : row) {
+                System.out.print(cell ? "S " : ". ");
+            }
+            System.out.println();
+        }
+
+        System.out.println("Nick 2:"+nick2);
+        for (boolean[] row : board2) {
+            for (boolean cell : row) {
+                System.out.print(cell ? "S " : ". ");
+            }
             System.out.println();
         }
     }

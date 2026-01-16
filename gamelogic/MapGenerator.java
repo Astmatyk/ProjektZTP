@@ -4,78 +4,83 @@ import gamelogic.enums.*;
 import java.util.Random;
 
 public class MapGenerator {
-    private static final double ISLAND_DENSITY = 0.08;
-    private static final int MAX_ISLANDS = 10;
 
     private MapGenerator() {}
 
-    public static void generate(MapType mapType, Board board, int mapSize) {
-        switch (mapType) {
-            case FULL_WATER -> {}
-            case ISLANDS -> generateIslands(board, mapSize);
-        }
+    public static Board fromLayout(int mapSize, boolean[][] layout) {
+        Board board = new Board(mapSize);
+        applyLayout(board, layout);
+        return board;
     }
 
-    private static void generateIslands(Board board, int mapSize) {
-        Random random = new Random();
+    private static void applyLayout(Board board, boolean[][] layout) {
+        int n = layout.length;
+        boolean[][] visited = new boolean[n][n];
 
-        int totalTiles = mapSize * mapSize;
-        int terrainTarget = (int) (totalTiles * ISLAND_DENSITY);
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < n; x++) {
 
-        boolean[][] placed = new boolean[mapSize][mapSize];
+                if (layout[y][x] && !visited[y][x]) {
 
-        int islands = Math.max(1, Math.min(MAX_ISLANDS, mapSize / 2));
-        int remaining = terrainTarget;
+                    Board.Direction dir;
+                    int len = 1;
 
-        for (int i = 0; i < islands && remaining > 0; i++) {
-            int startX = random.nextInt(mapSize);
-            int startY = random.nextInt(mapSize);
+                    // poziomy
+                    if (x + 1 < n && layout[y][x + 1]) {
+                        dir = Board.Direction.RIGHT;
+                        int xx = x + 1;
+                        while (xx < n && layout[y][xx]) {
+                            visited[y][xx] = true;
+                            len++;
+                            xx++;
+                        }
+                    }
+                    // pionowy
+                    else if (y + 1 < n && layout[y + 1][x]) {
+                        dir = Board.Direction.DOWN;
+                        int yy = y + 1;
+                        while (yy < n && layout[yy][x]) {
+                            visited[yy][x] = true;
+                            len++;
+                            yy++;
+                        }
+                    }
+                    // jednomasztowiec
+                    else {
+                        dir = Board.Direction.RIGHT;
+                    }
 
-            int maxIslandSize = Math.max(1, remaining / (islands - i));
-            int islandSize = 1 + random.nextInt(maxIslandSize);
+                    visited[y][x] = true;
 
-            remaining -= growIsland(board, placed, mapSize, startX, startY, islandSize, random);
-        }
+                    Board.PlaceResult res =
+                            board.placeShip(x, y, len, dir);
 
-        while (remaining > 0) {
-            int x = random.nextInt(mapSize);
-            int y = random.nextInt(mapSize);
+                    switch (res) {
+                        case OK -> {
+                        }
 
-            if (!placed[y][x]) {
-                placed[y][x] = true;
-                board.setFlag( MapFlags.TERRAIN, x, y);
-                remaining--;
+                        case OUT_OF_BOUNDS -> throw new IllegalStateException(
+                                "Statek wychodzi poza planszę"
+                        );
+
+                        case LENGTH_INVALID -> throw new IllegalStateException(
+                                "Niepoprawna długość statku"
+                        );
+
+                        case COLLIDES -> throw new IllegalStateException(
+                                "Statki nachodzą na siebie"
+                        );
+
+                        case TOUCHING_NOT_ALLOWED -> throw new IllegalStateException(
+                                "Statki nie mogą się stykać"
+                        );
+
+                        default -> throw new IllegalStateException(
+                                "Nieznany błąd konfiguracji planszy"
+                        );
+                    }
+                }
             }
         }
-    }
-
-    private static int growIsland(
-            Board board,
-            boolean placed[][],
-            int mapSize,
-            int startX,
-            int startY,
-            int size,
-            Random random
-    ) {
-        int x = startX;
-        int y = startY;
-        int newlyPlaced = 0;
-
-        for (int i = 0; i < size; i++) {
-            if (!placed[y][x]) {
-                placed[y][x] = true;
-                board.setFlag( MapFlags.TERRAIN, x, y);
-                newlyPlaced++;
-            }
-
-            switch (random.nextInt(4)) {
-                case 0 -> x = Math.max(0, x - 1);
-                case 1 -> x = Math.min(mapSize - 1, x + 1);
-                case 2 -> y = Math.max(0, y - 1);
-                case 3 -> y = Math.min(mapSize - 1, y + 1);
-            }
-        }
-        return newlyPlaced;
     }
 }

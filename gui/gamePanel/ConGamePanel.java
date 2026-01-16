@@ -1,79 +1,113 @@
 package gui.gamePanel;
 
+import gamelogic.*;
 import gui.MainGUI;
 import java.awt.*;
 import javax.swing.*;
 
-public class ConGamePanel extends JPanel implements GamePanelInterface {
+public class ConGamePanel extends JPanel implements GamePanelInterface, GameListener {
 
-    private MainGUI mainGUI;
-    private final int CELL_SIZE = 30; // Stały rozmiar komórki
-        
+    private final MainGUI mainGUI;
+    private final int CELL_SIZE = 30;
+    private final int mapSize;
+
+    // Referencje do przycisków, aby móc zmieniać ich kolory
+    private JButton[][] playerButtons;
+    private JButton[][] opponentButtons;
+    
+    // Logika gry
+    private Game game;
+    private Player player;
+    private Player opponent;
+
     public ConGamePanel(MainGUI mainGUI, int size, String p1, String p2) {
         this.mainGUI = mainGUI;
-            
-        this.setLayout(new BorderLayout());
+        this.mapSize = size;
+        this.playerButtons = new JButton[size][size];
+        this.opponentButtons = new JButton[size][size];
 
-        //------------------------------------------------Nagłówek------------------------------------------------
-        JLabel headerLabel = new JLabel("Rozmiar mapy: " + size + "x" + size, SwingConstants.CENTER);
-        headerLabel.setFont(new Font("SansSerif", Font.BOLD, 16));
-        headerLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        this.add(headerLabel, BorderLayout.NORTH);
+        setLayout(new BorderLayout());
 
-        //------------------------------------------------Kontener Plansz------------------------------------------------
-        // Panel z GridBagLayout, który wyśrodkuje plansze w pionie i poziomie
+        // 1. Nagłówek
+        JLabel headerLabel = new JLabel("Bitwa morska: " + size + "x" + size, SwingConstants.CENTER);
+        headerLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        headerLabel.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
+        add(headerLabel, BorderLayout.NORTH);
+
+        // 2. Kontener Plansz (Twój układ z GridBagLayout)
         JPanel boardsContainer = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(0, 20, 0, 20); // Odstęp między planszami
+        gbc.insets = new Insets(0, 30, 0, 30);
 
-        // Budowanie planszy Gracza 1
-        JPanel player1Board = createBoard(size, p1);
+        // Plansza Twoja (lewa)
         gbc.gridx = 0;
-        boardsContainer.add(player1Board, gbc);
+        boardsContainer.add(createBoard(size, p1, playerButtons, false), gbc);
 
-        // Budowanie planszy Gracza 2 (lub Komputera)
-        JPanel player2Board = createBoard(size, p2);
+        // Plansza Przeciwnika (prawa)
         gbc.gridx = 1;
-        boardsContainer.add(player2Board, gbc);
+        boardsContainer.add(createBoard(size, p2, opponentButtons, true), gbc);
 
-        this.add(boardsContainer, BorderLayout.CENTER);
+        add(boardsContainer, BorderLayout.CENTER);
 
-        //------------------------------------------------Stopka------------------------------------------------
-        JButton exitBtn = new JButton("Wyjdź do menu");
-        exitBtn.addActionListener(al -> mainGUI.showView("MENU"));
+        // 3. Stopka z przyciskami sterującymi
+        JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JButton startBtn = new JButton("Start");
+        startBtn.addActionListener(e -> initGameLogic(p1, p2));
         
-        // Panel pomocniczy dla przycisku, żeby nie zajmował całej szerokości
-        JPanel footerPanel = new JPanel();
-        footerPanel.add(exitBtn);
-        this.add(footerPanel, BorderLayout.SOUTH);
+        JButton exitBtn = new JButton("Menu");
+        exitBtn.addActionListener(e -> mainGUI.showView("MENU"));
+
+        footer.add(startBtn);
+        footer.add(exitBtn);
+        add(footer, BorderLayout.SOUTH);
     }
 
-    private JPanel createBoard(int size, String playerName) {
-        JPanel wrapper = new JPanel(new BorderLayout());
-        
-        // Nick nad planszą
-        JLabel nameLabel = new JLabel(playerName, SwingConstants.CENTER);
+    private JPanel createBoard(int size, String name, JButton[][] matrix, boolean clickable) {
+        JPanel wrapper = new JPanel(new BorderLayout(0, 10));
+        JLabel nameLabel = new JLabel(name, SwingConstants.CENTER);
         nameLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         wrapper.add(nameLabel, BorderLayout.NORTH);
 
-        // Siatka o stałym rozmiarze
         JPanel grid = new JPanel(new GridLayout(size, size));
         int totalPx = size * CELL_SIZE;
         grid.setPreferredSize(new Dimension(totalPx, totalPx));
-        grid.setBackground(Color.BLACK);
-        grid.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
 
-        // Wypełnienie siatki przyciskami/polami
-        for (int i = 0; i < size * size; i++) {
-            JButton cell = new JButton();
-            cell.setBackground(Color.WHITE);
-            cell.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
-            // Tutaj w przyszłości dodasz ActionListenera do strzelania
-            grid.add(cell);
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                JButton cell = new JButton();
+                cell.setBackground(Color.CYAN);
+                cell.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
+                cell.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+                
+                matrix[x][y] = cell; // Zapisujemy referencję
+
+                if (clickable) {
+                    final int fx = x;
+                    final int fy = y;
+                    cell.addActionListener(e -> handleShot(fx, fy));
+                }
+                grid.add(cell);
+            }
         }
-
         wrapper.add(grid, BorderLayout.CENTER);
         return wrapper;
+    }
+
+    private void initGameLogic(String p1, String p2) {
+        // Tutaj inicjalizujesz klasy z gamelogic (Board, Player, Game)
+        // Możesz użyć metody placeRandomFleet, którą miałeś wcześniej
+        System.out.println("Logika gry zainicjalizowana dla " + p1 + " vs " + p2);
+    }
+
+    private void handleShot(int x, int y) {
+        // Logika strzału: game.shoot(...)
+        // Po strzale kolory zaktualizują się przez metodę update(GameEvent)
+        opponentButtons[x][y].setBackground(Color.BLACK); // Przykład wizualny
+    }
+
+    @Override
+    public void update(GameEvent event) {
+        // Tutaj pętla po matrixach i update kolorów na podstawie MapFlags
     }
 
     @Override

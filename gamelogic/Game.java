@@ -1,6 +1,10 @@
 package gamelogic;
 
+
+import gamelogic.enums.EventType;
 import gamelogic.enums.ShotResult;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Game {
 
@@ -10,13 +14,12 @@ public class Game {
     private boolean gameOver = false;
     private GameHistory history;
     private final String gameId;
+    private List<GameListener> listenersList = new ArrayList<>();
 
-    //nowa gra
     public Game(Player p1, Player p2) {
         this(p1, p2, String.valueOf(System.currentTimeMillis()));
     }
 
-    //gra istniejąca
     public Game(Player p1, Player p2, String gameId) {
         this.player1 = p1;
         this.player2 = p2;
@@ -37,6 +40,13 @@ public class Game {
         return currentPlayer;
     }
 
+    public void notify(GameEvent event) {
+        for(GameListener listener: listenersList)
+        {
+            listener.update(event);
+        }
+    }
+
     public ShotResult shoot(Player attacker, Coordinates coords) {
         if (gameOver || attacker != currentPlayer) {
             throw new IllegalStateException("Not your turn or game over");
@@ -50,8 +60,11 @@ public class Game {
         // Strzelający aktualizuje swoją mapę strzałów
         attacker.updateShootingBoard(coords, result);
 
+        notify(new GameEvent(EventType.SHOT_FIRED,(result!=ShotResult.MISS), attacker));
+
         // Sprawdzenie końca gry
         if (defender.getOwnBoard().isAllShipsSink()) {
+            notify(new GameEvent(EventType.GAME_END,true ,attacker));
             gameOver = true;
         } else {
             // zmiana tury tylko jeśli pudło
@@ -60,11 +73,14 @@ public class Game {
             }
         }
 
+        // po każdym strzale następuje save naszego stanu
+        save(result);
+
         return result;
     }
 
-    public Snapshot save() {
-        Snapshot snap = new Snapshot(player1, player2, currentPlayer, null);
+    public Snapshot save(ShotResult result) {
+        Snapshot snap = new Snapshot(player1, player2, currentPlayer, result);
         history.push(snap);
         return snap;
     }
@@ -84,4 +100,9 @@ public class Game {
     public GameHistory getHistory() {
         return history;
     }
+
+    public void addListener(GameListener listener) {
+        listenersList.add(listener);
+    }
+
 }
