@@ -1,63 +1,38 @@
 package gui.gameconfig;
 
-import java.awt.*;
-import java.util.*;
 import javax.swing.*;
 
 public class PvPBoardConfigurator extends BoardConfiguratorAbstract {
 
     private boolean isPlayer2Active = false;
-    private final JLabel titleLabel;
 
     public PvPBoardConfigurator(int size) {
         super(size);
-        initFlota();
-
-        setLayout(new BorderLayout(10, 10));
-        titleLabel = new JLabel("GRACZ 1: Ustaw swoje statki", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
-        add(titleLabel, BorderLayout.NORTH);
-
-        boardPanel = new BoardPanel();
-        add(boardPanel, BorderLayout.CENTER);
-
-        shipsPanel = new JPanel();
-        shipsPanel.setLayout(new BoxLayout(shipsPanel, BoxLayout.Y_AXIS));
-        shipsPanel.setBorder(BorderFactory.createTitledBorder("Statki"));
-        add(shipsPanel, BorderLayout.EAST);
-
-        updateShipsPanel();
-
-        confirmButton = new JButton("Zatwierdź planszę Gracza 1");
-        confirmButton.setEnabled(false);
+        initRemainingShips();
+        
+        // Budujemy interfejs dla pierwszego gracza
+        fillUI(player1Board, "GRACZ 1: Ustaw swoje statki", "Zatwierdź planszę Gracza 1");
+        
+        // Podpinamy specyficzną logikę pod przycisk
         confirmButton.addActionListener(e -> handleConfirm());
-        add(confirmButton, BorderLayout.SOUTH);
-    }
-
-    private void initFlota() {
-        remainingShips = new LinkedHashMap<>();
-        remainingShips.put(4, 1); remainingShips.put(3, 2);
-        remainingShips.put(2, 3); remainingShips.put(1, 4);
     }
 
     private void handleConfirm() {
         if (!isPlayer2Active) {
-            JOptionPane.showMessageDialog(this, "Teraz tura Gracza 2!");
+            JOptionPane.showMessageDialog(this, "Gracz 1 gotowy. Teraz tura Gracza 2!");
+            
             isPlayer2Active = true;
-            initFlota();
-            titleLabel.setText("GRACZ 2: Ustaw swoje statki");
-            confirmButton.setText("Zatwierdź i graj");
-            confirmButton.setEnabled(false);
-            boardPanel.clearVisuals();
-            updateShipsPanel();
-        } else {
-            JOptionPane.showMessageDialog(this, "Gotowe!");
-            // Tutaj logika startu gry
-        }
-    }
+            initRemainingShips();
+            selectedShipLength = -1;
 
-    @Override
-    protected boolean[][] getActiveBoard() {
-        return isPlayer2Active ? player2Board : player1Board;
+            // RESTART OKNA DLA GRACZA 2
+            fillUI(player2Board, "GRACZ 2: Ustaw swoje statki", "Zatwierdź i rozpocznij grę");
+            
+            // Ponowne podpięcie listenera (bo fillUI stworzył nowy przycisk)
+            confirmButton.addActionListener(e -> handleConfirm());
+        } else {
+            JOptionPane.showMessageDialog(this, "Obie plansze skonfigurowane!");
+            // Tutaj np. callback do MainGUI
+        }
     }
 }

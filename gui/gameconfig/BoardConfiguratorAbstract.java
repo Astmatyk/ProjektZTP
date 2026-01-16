@@ -14,8 +14,9 @@ public abstract class BoardConfiguratorAbstract extends JPanel {
     protected BoardPanel boardPanel;
     protected JPanel shipsPanel;
     protected JButton confirmButton;
+    protected JLabel titleLabel;
 
-    protected Map<Integer, Integer> remainingShips = new LinkedHashMap<>(); // Inicjalizacja domyślna
+    protected Map<Integer, Integer> remainingShips = new LinkedHashMap<>();
     protected int selectedShipLength = -1;
     protected boolean horizontal = true;
 
@@ -25,10 +26,51 @@ public abstract class BoardConfiguratorAbstract extends JPanel {
         this.player2Board = new boolean[size][size];
     }
 
-    // Klasy potomne muszą powiedzieć, którą planszę teraz "klika" gracz
-    protected abstract boolean[][] getActiveBoard();
+    /**
+     * Główna metoda budująca interfejs dla konkretnej tablicy.
+     */
+    protected void fillUI(boolean[][] targetBoard, String titleText, String buttonText) {
+        this.removeAll();
+        this.setLayout(new BorderLayout(10, 10));
 
-    // --- LOGIKA STAWIANIA ---
+        // Nagłówek
+        titleLabel = new JLabel(titleText, SwingConstants.CENTER);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
+        add(titleLabel, BorderLayout.NORTH);
+
+        // Centrum: Plansza
+        JPanel centerPanel = new JPanel(new BorderLayout(10, 10));
+        this.boardPanel = new BoardPanel(targetBoard);
+        centerPanel.add(boardPanel, BorderLayout.CENTER);
+
+        // Prawa strona: Statki
+        this.shipsPanel = new JPanel();
+        shipsPanel.setLayout(new BoxLayout(shipsPanel, BoxLayout.Y_AXIS));
+        shipsPanel.setBorder(BorderFactory.createTitledBorder("Pozostałe statki"));
+        updateShipsPanel();
+        centerPanel.add(shipsPanel, BorderLayout.EAST);
+
+        add(centerPanel, BorderLayout.CENTER);
+
+        // Dół: Przycisk
+        this.confirmButton = new JButton(buttonText);
+        this.confirmButton.setEnabled(false);
+        add(confirmButton, BorderLayout.SOUTH);
+
+        this.revalidate();
+        this.repaint();
+    }
+
+    // --- LOGIKA POMOCNICZA ---
+
+    protected void initRemainingShips() {
+        remainingShips.clear();
+        remainingShips.put(4, 1);
+        remainingShips.put(3, 2);
+        remainingShips.put(2, 3);
+        remainingShips.put(1, 4);
+    }
+
     protected boolean canPlaceShip(boolean[][] board, int x, int y, int length, boolean horizontal) {
         for (int i = 0; i < length; i++) {
             int xi = horizontal ? x + i : x;
@@ -49,36 +91,6 @@ public abstract class BoardConfiguratorAbstract extends JPanel {
         return true;
     }
 
-    protected void placeShip(boolean[][] board, int x, int y, int length, boolean horizontal) {
-        for (int i = 0; i < length; i++) {
-            int xi = horizontal ? x + i : x;
-            int yi = horizontal ? y : y + i;
-            board[xi][yi] = true;
-        }
-    }
-
-    protected boolean[][] placeRandomFleet(int size) {
-        int[] ships = new int[]{4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
-        boolean[][] board = new boolean[size][size];
-        Random rnd = new Random();
-        for (int len : ships) {
-            boolean placed = false;
-            int attempts = 0;
-            while (!placed && attempts < 500) {
-                attempts++;
-                int x = rnd.nextInt(size);
-                int y = rnd.nextInt(size);
-                boolean hor = rnd.nextBoolean();
-                if (canPlaceShip(board, x, y, len, hor)) {
-                    placeShip(board, x, y, len, hor);
-                    placed = true;
-                }
-            }
-        }
-        return board;
-    }
-
-    // --- GUI ---
     protected void updateShipsPanel() {
         if (shipsPanel == null) return;
         shipsPanel.removeAll();
@@ -94,25 +106,48 @@ public abstract class BoardConfiguratorAbstract extends JPanel {
         shipsPanel.repaint();
     }
 
+    protected boolean[][] placeRandomFleet(int size) {
+        boolean[][] board = new boolean[size][size];
+        int[] ships = {4, 3, 3, 2, 2, 2, 1, 1, 1, 1};
+        Random rnd = new Random();
+        for (int len : ships) {
+            boolean placed = false;
+            while (!placed) {
+                int x = rnd.nextInt(size), y = rnd.nextInt(size);
+                boolean hor = rnd.nextBoolean();
+                if (canPlaceShip(board, x, y, len, hor)) {
+                    for (int i = 0; i < len; i++) board[hor ? x + i : x][hor ? y : y + i] = true;
+                    placed = true;
+                }
+            }
+        }
+        return board;
+    }
+
+    // --- KLASA WEWNĘTRZNA PANELU ---
+
     protected class BoardPanel extends JPanel {
         private final JButton[][] cells = new JButton[size][size];
+        private final boolean[][] target;
         private int hoverX = -1, hoverY = -1;
 
-        BoardPanel() {
+        BoardPanel(boolean[][] target) {
+            this.target = target;
             setLayout(new GridLayout(size, size, 1, 1));
             setBackground(Color.BLACK);
             for (int y = 0; y < size; y++) {
                 for (int x = 0; x < size; x++) {
                     JButton cell = new JButton();
-                    cell.setBackground(Color.CYAN);
+                    cell.setBackground(target[x][y] ? Color.GRAY : Color.CYAN);
                     cell.setPreferredSize(new Dimension(40, 40));
                     final int fx = x, fy = y;
+                    
                     cell.addMouseListener(new MouseAdapter() {
                         public void mouseEntered(MouseEvent e) { hoverX = fx; hoverY = fy; repaintPreview(); }
                         public void mouseClicked(MouseEvent e) {
                             if (SwingUtilities.isRightMouseButton(e)) { horizontal = !horizontal; repaintPreview(); }
-                            else if (selectedShipLength > 0 && canPlaceShip(getActiveBoard(), fx, fy, selectedShipLength, horizontal)) {
-                                placeShip(getActiveBoard(), fx, fy, selectedShipLength, horizontal);
+                            else if (selectedShipLength > 0 && canPlaceShip(target, fx, fy, selectedShipLength, horizontal)) {
+                                for (int i = 0; i < selectedShipLength; i++) target[horizontal ? fx + i : fx][horizontal ? fy : fy + i] = true;
                                 remainingShips.put(selectedShipLength, remainingShips.get(selectedShipLength) - 1);
                                 selectedShipLength = -1;
                                 updateShipsPanel();
@@ -127,15 +162,10 @@ public abstract class BoardConfiguratorAbstract extends JPanel {
             }
         }
 
-        public void clearVisuals() {
-            for (int y = 0; y < size; y++)
-                for (int x = 0; x < size; x++) cells[x][y].setBackground(Color.CYAN);
-        }
-
         private void repaintPreview() {
             clearPreview();
             if (selectedShipLength <= 0 || hoverX < 0) return;
-            boolean ok = canPlaceShip(getActiveBoard(), hoverX, hoverY, selectedShipLength, horizontal);
+            boolean ok = canPlaceShip(target, hoverX, hoverY, selectedShipLength, horizontal);
             Color color = ok ? new Color(0, 200, 0, 150) : new Color(200, 0, 0, 150);
             for (int i = 0; i < selectedShipLength; i++) {
                 int nx = horizontal ? hoverX + i : hoverX;
@@ -145,9 +175,8 @@ public abstract class BoardConfiguratorAbstract extends JPanel {
         }
 
         private void clearPreview() {
-            boolean[][] b = getActiveBoard();
             for (int y = 0; y < size; y++)
-                for (int x = 0; x < size; x++) cells[x][y].setBackground(b[x][y] ? Color.GRAY : Color.CYAN);
+                for (int x = 0; x < size; x++) cells[x][y].setBackground(target[x][y] ? Color.GRAY : Color.CYAN);
         }
     }
 
