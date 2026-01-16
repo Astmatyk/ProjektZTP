@@ -5,6 +5,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public class Board implements Serializable {
     private int size;
     private MapFlags[][] cells;
@@ -131,15 +134,16 @@ public class Board implements Serializable {
 
         switch (cells[y][x]) {
 
-            case SHIP -> {
-                cells[y][x] = MapFlags.SHIP_WRECKED;
-                if(isShipSunkAt(x, y)) {
-                	markSunkShip(x, y);
-                	return ShotResult.SINK;
-                }
-                else
-                 	return ShotResult.HIT;
-            }
+	        case SHIP -> {
+	            cells[y][x] = MapFlags.SHIP_WRECKED;
+	            if(isShipSunkAt(x, y)) {
+	            	markSunkShip(x, y);
+	            	return ShotResult.SINK;
+	            }
+	            else
+	             	return ShotResult.HIT;
+	        }
+
 
             case SHIP_WRECKED -> {
                 // już trafione
@@ -202,7 +206,7 @@ public class Board implements Serializable {
 
         return true;
     }
-
+    
     public void markSunkShip(int x, int y) {
     	setFlag(MapFlags.SHIP_WRECKED, x, y);
         List<Coordinates> segments = getShipCoordinates(x, y);
