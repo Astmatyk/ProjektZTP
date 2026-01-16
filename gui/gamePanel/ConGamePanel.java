@@ -1,8 +1,6 @@
 package gui.gamePanel;
 
 import gamelogic.*;
-import gamelogic.enums.MapFlags;
-import gamelogic.enums.ShotResult;
 import gui.MainGUI;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,76 +10,109 @@ import java.awt.event.ComponentEvent;
 import java.util.Random;
 import javax.swing.*;
 
-public class ConGamePanel extends JPanel implements GameListener {
+public class ConGamePanel extends JPanel implements GamePanelInterface, GameListener {
 
     private final MainGUI mainGUI;
-    private JPanel ownBoardPanel;
-    private JPanel oppBoardPanel;
-    private JButton[][] ownButtons;
-    private JButton[][] oppButtons;
-    private JLabel statusLabel;
+    private final int CELL_SIZE = 30;
+    private final int mapSize;
 
+    // Referencje do przycisków, aby móc zmieniać ich kolory
+    private JButton[][] playerButtons;
+    private JButton[][] opponentButtons;
+    
+    // Logika gry
     private Game game;
-    private Player humanPlayer;
+    private Player player;
     private Player opponent;
-    private boolean isPvE = true;
-    private boolean isPvP = true;
-    private boolean isEvE = true;
-    private int mapSize = 10;
-    private int opponentDelay = 200;
 
-    public ConGamePanel(MainGUI mainGUI) {
+    public ConGamePanel(MainGUI mainGUI, int size, String p1, String p2) {
         this.mainGUI = mainGUI;
-        setLayout(new BorderLayout(8,8));
+        this.mapSize = size;
+        this.playerButtons = new JButton[size][size];
+        this.opponentButtons = new JButton[size][size];
 
-        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        String[] modes = new String[]{"PvE","PvP","EvE"};
-        JComboBox<String> modeBox = new JComboBox<>(modes);
-        modeBox.addActionListener(e -> isPvE = modeBox.getSelectedItem().equals("PvE"));
-        modeBox.addActionListener(e -> isPvP = modeBox.getSelectedItem().equals("PvP"));
-        modeBox.addActionListener(e -> isEvE = modeBox.getSelectedItem().equals("EvE"));
-        isPvE = modeBox.getSelectedItem().equals("PvE");
-        isPvP = modeBox.getSelectedItem().equals("PvP");
-        isEvE = modeBox.getSelectedItem().equals("EvE");
+        setLayout(new BorderLayout());
 
-        Integer[] sizes = new Integer[]{10,15,20};
-        JComboBox<Integer> sizeBox = new JComboBox<>(sizes);
-        sizeBox.setSelectedItem(mapSize);
-        sizeBox.addActionListener(e -> mapSize = (Integer)sizeBox.getSelectedItem());
+        // 1. Nagłówek
+        JLabel headerLabel = new JLabel("Bitwa morska: " + size + "x" + size, SwingConstants.CENTER);
+        headerLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+        headerLabel.setBorder(BorderFactory.createEmptyBorder(15, 0, 15, 0));
+        add(headerLabel, BorderLayout.NORTH);
 
-        JSlider delaySlider = new JSlider(JSlider.HORIZONTAL, 50, 2000, 200);
-        delaySlider.setMajorTickSpacing(500);
-        delaySlider.setMinorTickSpacing(50);
-        delaySlider.setPaintTicks(true);
-        delaySlider.setPaintLabels(true);
-        delaySlider.addChangeListener(e -> opponentDelay = delaySlider.getValue());
+        // 2. Kontener Plansz (Twój układ z GridBagLayout)
+        JPanel boardsContainer = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 30, 0, 30);
 
-        JButton startBtn = new JButton("Nowa gra");
-        startBtn.addActionListener(e -> startGame());
+        // Plansza Twoja (lewa)
+        gbc.gridx = 0;
+        boardsContainer.add(createBoard(size, p1, playerButtons, false), gbc);
 
-        JButton backButton = new JButton("Wstecz");
-        backButton.addActionListener(e -> mainGUI.showView("MENU"));
+        // Plansza Przeciwnika (prawa)
+        gbc.gridx = 1;
+        boardsContainer.add(createBoard(size, p2, opponentButtons, true), gbc);
 
-        topPanel.add(new JLabel("Tryb:"));
-        topPanel.add(modeBox);
-        topPanel.add(new JLabel("Rozmiar:"));
-        topPanel.add(sizeBox);
-        topPanel.add(new JLabel("Retardacja przeciwnika:"));
-        topPanel.add(delaySlider);
-        topPanel.add(startBtn);
-        topPanel.add(backButton);
+        add(boardsContainer, BorderLayout.CENTER);
 
-        add(topPanel, BorderLayout.NORTH);
+        // 3. Stopka z przyciskami sterującymi
+        JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        JButton startBtn = new JButton("Start");
+        startBtn.addActionListener(e -> initGameLogic(p1, p2));
+        
+        JButton exitBtn = new JButton("Menu");
+        exitBtn.addActionListener(e -> mainGUI.showView("MENU"));
 
-        JPanel center = new JPanel(new GridLayout(1,2,10,10));
-        ownBoardPanel = new JPanel();
-        oppBoardPanel = new JPanel();
-        center.add(wrapWithTitled("Twoja plansza", ownBoardPanel));
-        center.add(wrapWithTitled("Plansza przeciwnika", oppBoardPanel));
-        add(center, BorderLayout.CENTER);
+        footer.add(startBtn);
+        footer.add(exitBtn);
+        add(footer, BorderLayout.SOUTH);
+    }
 
-        statusLabel = new JLabel("Brak aktywnej gry");
-        add(statusLabel, BorderLayout.SOUTH);
+    private JPanel createBoard(int size, String name, JButton[][] matrix, boolean clickable) {
+        JPanel wrapper = new JPanel(new BorderLayout(0, 10));
+        JLabel nameLabel = new JLabel(name, SwingConstants.CENTER);
+        nameLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+        wrapper.add(nameLabel, BorderLayout.NORTH);
+
+        JPanel grid = new JPanel(new GridLayout(size, size));
+        int totalPx = size * CELL_SIZE;
+        grid.setPreferredSize(new Dimension(totalPx, totalPx));
+
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                JButton cell = new JButton();
+                cell.setBackground(Color.CYAN);
+                cell.setPreferredSize(new Dimension(CELL_SIZE, CELL_SIZE));
+                cell.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+                
+                matrix[x][y] = cell; // Zapisujemy referencję
+
+                if (clickable) {
+                    final int fx = x;
+                    final int fy = y;
+                    cell.addActionListener(e -> handleShot(fx, fy));
+                }
+                grid.add(cell);
+            }
+        }
+        wrapper.add(grid, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private void initGameLogic(String p1, String p2) {
+        // Tutaj inicjalizujesz klasy z gamelogic (Board, Player, Game)
+        // Możesz użyć metody placeRandomFleet, którą miałeś wcześniej
+        System.out.println("Logika gry zainicjalizowana dla " + p1 + " vs " + p2);
+    }
+
+    private void handleShot(int x, int y) {
+        // Logika strzału: game.shoot(...)
+        // Po strzale kolory zaktualizują się przez metodę update(GameEvent)
+        opponentButtons[x][y].setBackground(Color.BLACK); // Przykład wizualny
+    }
+
+    @Override
+    public void update(GameEvent event) {
+        // Tutaj pętla po matrixach i update kolorów na podstawie MapFlags
     }
 
     private JPanel wrapWithTitled(String title, JPanel p) {
@@ -316,5 +347,10 @@ public class ConGamePanel extends JPanel implements GameListener {
                 statusLabel.setText("Event: " + event.type + " result=" + event.result);
             }
         });
+    }
+    
+    @Override    
+    public void display() {
+        setVisible(true);
     }
 }
