@@ -2,9 +2,13 @@ package gamelogic;
 import gamelogic.enums.*;
 
 public class GameBuilderEvE implements GameBuilder {
-
     private final int mapSize;
+    private final String bot1Name;
+    private final String bot2Name;
     private final BotDifficulty difficulty;
+
+    private final boolean[][] bot1Layout;
+    private final boolean[][] bot2Layout;
 
     private Board board1;
     private Board board2;
@@ -12,18 +16,19 @@ public class GameBuilderEvE implements GameBuilder {
     private Player player1;
     private Player player2;
 
-    public GameBuilderEvE(int mapSize, BotDifficulty difficulty) {
+    public GameBuilderEvE(int mapSize, String player1Name, String player2Name, boolean[][] p1Layout, boolean[][] p2Layout, BotDifficulty difficulty) {
         this.mapSize = mapSize;
+        this.bot1Name = player1Name;
+        this.bot2Name = player2Name;
         this.difficulty = difficulty;
+        this.bot1Layout = p1Layout;
+        this.bot2Layout = p2Layout;
     }
 
     @Override
     public void buildBoard() {
-        board1 = new Board(mapSize);
-        board2 = new Board(mapSize);
-        
-        placeShipsRandomly(board1);
-        placeShipsRandomly(board2);
+        board1 = MapGenerator.fromLayout(mapSize, bot1Layout);
+        board2 = MapGenerator.fromLayout(mapSize, bot2Layout);
     }
 
     private void placeShipsRandomly(Board board) {
