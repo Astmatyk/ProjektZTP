@@ -11,6 +11,7 @@ public class Game {
     private Player player1;
     private Player player2;
     private Player currentPlayer;
+    private Player nextPlayer;
     private boolean gameOver = false;
     private GameHistory history;
     private final String gameId;
@@ -24,6 +25,7 @@ public class Game {
         this.player1 = p1;
         this.player2 = p2;
         this.currentPlayer = p1;
+        this.nextPlayer = p2;
         this.gameId = gameId != null ? gameId : String.valueOf(System.currentTimeMillis());
         this.history = new GameHistory(this.gameId);
     }
@@ -38,6 +40,10 @@ public class Game {
 
     public Player getCurrentPlayer() {
         return currentPlayer;
+    }
+
+    public Player getNextPlayer() {
+        return nextPlayer;
     }
 
     public void notify(GameEvent event) {
@@ -70,6 +76,7 @@ public class Game {
             // zmiana tury tylko jeśli pudło
             if (result == ShotResult.MISS) {
                 currentPlayer = defender;
+                nextPlayer = attacker;
             }
         }
 
