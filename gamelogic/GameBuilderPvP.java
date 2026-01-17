@@ -21,6 +21,8 @@ public class GameBuilderPvP implements GameBuilder {
         this.player2Name = player2Name;
         this.p1Layout = p1Layout;
         this.p2Layout = p2Layout;
+        buildBoard();
+        buildPlayers();
     }
 
     @Override

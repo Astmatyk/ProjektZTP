@@ -25,6 +25,8 @@ public class GameBuilderPvE implements GameBuilder {
         this.difficulty = difficulty;
         this.playerLayout = p1Layout;
         this.botLayout = p2Layout;
+        buildBoard();
+        buildPlayers();
     }
 
     @Override

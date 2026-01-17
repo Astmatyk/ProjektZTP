@@ -23,6 +23,8 @@ public class GameBuilderEvE implements GameBuilder {
         this.difficulty = difficulty;
         this.bot1Layout = p1Layout;
         this.bot2Layout = p2Layout;
+        buildBoard();
+        buildPlayers();
     }
 
     @Override

@@ -158,29 +158,37 @@ public class GameConfigPanel extends JPanel {
                     board2 = configurator.getBoards().get(1);
                     boardsConfigured = true;
                     updatePlayButtonState();
-                    gameBuilder = new GameBuilderPvE(mapSize, nick1, nick2, board1, board2, difficultyFlag);
                 }
             }
         });
 
+        // W GameConfigPanel.java - zmień kod w playButton:
         playButton.addActionListener(e -> {
-            if (modeFlag.equals("EVE")) {
-                EvEBoardConfigurator configurator = new EvEBoardConfigurator(mapSize);
-                board1 = configurator.getBoards().get(0);
-                board2 = configurator.getBoards().get(1);
-                boardsConfigured = true;
-                //gameBuilder = new GameBuilderEvE(mapSize, difficultyFlag, board1, board2); -- do implementacji jak ogarnę konstruktor
-            }
-            
             nick1 = firstText.getText();
             nick2 = secondText.getText();
-            test(); 
 
-            game = gameBuilder.getResult();
+            // Inicjalizacja buildera tuż przed startem
+            if (modeFlag.equals("PVP")) {
+                gameBuilder = new GameBuilderPvP(mapSize, nick1, nick2, board1, board2);
+            } else if (modeFlag.equals("PVE")) {
+                gameBuilder = new GameBuilderPvE(mapSize, nick1, nick2, board1, board2, difficultyFlag);
+            } else if (modeFlag.equals("EVE")) {
+                EvEBoardConfigurator configurator2 = new EvEBoardConfigurator(mapSize);
+                int result = JOptionPane.showConfirmDialog(this, configurator2, "Konfiguracja PVP", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+                if (result == JOptionPane.OK_OPTION) {
+                    board1 = configurator2.getBoards().get(0);
+                    board2 = configurator2.getBoards().get(1);
+                    boardsConfigured = true;
+                    updatePlayButtonState();
+                }
+                gameBuilder = new GameBuilderEvE(mapSize, nick1, nick2, board1, board2, difficultyFlag);
+            }
 
-            
-            // Przekazanie flagi trudności do mainGUI
-            mainGUI.launchGame(mapSize, modeFlag, nick1, nick2, game);
+            if (gameBuilder != null) {
+                game = gameBuilder.getResult();
+                mainGUI.launchGame(mapSize, modeFlag, nick1, nick2, game);
+            }
+            test();
         });
 
         updateUIState(easy, normal, hard, diffLabel, configBoardButton, pvp, pvc);
