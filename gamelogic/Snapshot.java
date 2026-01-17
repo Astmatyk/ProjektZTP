@@ -1,13 +1,12 @@
 package gamelogic;
 
-import gamelogic.enums.*;
+import gamelogic.enums.ShotResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import gamelogic.enums.ShotResult;
 
 public class Snapshot implements Serializable {
     private Player p1Board;
@@ -64,7 +63,7 @@ public class Snapshot implements Serializable {
                 return (T) ois.readObject();
             }
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("deep copy się nie udał: ", e);
+            throw new RuntimeException("wszystko działa poprawnie i jest super", e);
         }
     }
 }

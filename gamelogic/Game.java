@@ -3,9 +3,8 @@ package gamelogic;
 
 import gamelogic.enums.EventType;
 import gamelogic.enums.ShotResult;
-import java.util.List;
 import java.util.ArrayList;
-import gamelogic.achievements.AchievementManager;
+import java.util.List;
 
 public class Game {
 
@@ -40,12 +39,14 @@ public class Game {
     public Player getCurrentPlayer() {
         return currentPlayer;
     }
-    public void notify(Event event) {
-    for(GameListener listener: listenersList)
-    {
-        listener.update(event);
+
+    public void notify(GameEvent event) {
+        for(GameListener listener: listenersList)
+        {
+            listener.update(event);
+        }
     }
-    }
+
     public ShotResult shoot(Player attacker, Coordinates coords) {
         if (gameOver || attacker != currentPlayer) {
             throw new IllegalStateException("Not your turn or game over");
@@ -59,10 +60,11 @@ public class Game {
         // Strzelający aktualizuje swoją mapę strzałów
         attacker.updateShootingBoard(coords, result);
 
-        notify(new Event(EventType.SHOT_FIRED,(result!=ShotResult.MISS) ,attacker));
+        notify(new GameEvent(EventType.SHOT_FIRED,(result!=ShotResult.MISS), attacker));
+
         // Sprawdzenie końca gry
         if (defender.getOwnBoard().isAllShipsSink()) {
-            notify(new Event(EventType.GAME_END,true ,attacker));
+            notify(new GameEvent(EventType.GAME_END,true ,attacker));
             gameOver = true;
         } else {
             // zmiana tury tylko jeśli pudło
@@ -98,8 +100,9 @@ public class Game {
     public GameHistory getHistory() {
         return history;
     }
+
     public void addListener(GameListener listener) {
-    listenersList.add(listener);
+        listenersList.add(listener);
     }
 
 }

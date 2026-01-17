@@ -1,7 +1,7 @@
 package gamelogic.achievements;
 import java.util.List;
 import java.util.ArrayList;
-import gamelogic.Event;
+import gamelogic.GameEvent;
 import gamelogic.GameListener;
 
 public class AchievementManager implements GameListener {
@@ -11,7 +11,7 @@ public class AchievementManager implements GameListener {
     {
         achievements.add(achievement);
     }
-    @Override public void update(Event event) {
+    @Override public void update(GameEvent event) {
         for (Achievement achievement : achievements) {
             achievement.update(event);
         }

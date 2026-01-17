@@ -1,9 +1,8 @@
 package gui;
 
-import javax.swing.*;
-import java.awt.*;
-
 import gui.gameconfig.PvEBoardConfigurator;
+import java.awt.*;
+import javax.swing.*;
 
 public class GameConfigPanel extends JPanel {
     String modeFlag;        // globalny tryb gry
@@ -27,8 +26,11 @@ public class GameConfigPanel extends JPanel {
         // Panel trybu gry
         JPanel modePanel = new JPanel(new FlowLayout(FlowLayout.CENTER,20,10));
         JRadioButton pvp = new JRadioButton("Gracz vs Gracz", true);
+        pvp.setEnabled(false);
         JRadioButton pvc = new JRadioButton("Gracz vs Komputer");
+        pvc.setEnabled(false);
         JRadioButton cvc = new JRadioButton("Komputer vs Komputer");
+        cvc.setEnabled(false);
 
         ButtonGroup modeGroup = new ButtonGroup();
         modeGroup.add(pvp); modeGroup.add(pvc); modeGroup.add(cvc);
@@ -52,9 +54,13 @@ public class GameConfigPanel extends JPanel {
         // Panel ustawień planszy
         JPanel boardPanel = new JPanel(new FlowLayout(FlowLayout.CENTER,20,10));
         JRadioButton sizeTen = new JRadioButton("10x10", true);
+        sizeTen.setEnabled(false);
         JRadioButton sizeTwenty = new JRadioButton("20x20");
+        sizeTwenty.setEnabled(false);
         JRadioButton sizeThirty = new JRadioButton("30x30");
+        sizeThirty.setEnabled(false);
         JCheckBox islands = new JCheckBox("Wyspy");
+        islands.setEnabled(false);
 
         ButtonGroup sizeGroup = new ButtonGroup();
         sizeGroup.add(sizeTen); sizeGroup.add(sizeTwenty); sizeGroup.add(sizeThirty);
@@ -76,15 +82,16 @@ public class GameConfigPanel extends JPanel {
 
         // Przycisk konfiguracji plansz
         JButton configBoardButton = new JButton("Konfiguracja plansz");
+        configBoardButton.setEnabled(false);
         gbc.gridy = 4; gbc.fill=GridBagConstraints.HORIZONTAL;
         this.add(configBoardButton, gbc);
 
         // Enable/disable przycisku
-        Runnable updateConfigButton = () -> configBoardButton.setEnabled(pvp.isSelected() || pvc.isSelected());
-        pvp.addActionListener(e->updateConfigButton.run());
-        pvc.addActionListener(e->updateConfigButton.run());
-        cvc.addActionListener(e->updateConfigButton.run());
-        updateConfigButton.run();
+        // Runnable updateConfigButton = () -> configBoardButton.setEnabled(pvp.isSelected() || pvc.isSelected());
+        // pvp.addActionListener(e->updateConfigButton.run());
+        // pvc.addActionListener(e->updateConfigButton.run());
+        // cvc.addActionListener(e->updateConfigButton.run());
+        // updateConfigButton.run();
 
         // Przycisk Graj / Wstecz
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER,20,10));
@@ -123,15 +130,15 @@ public class GameConfigPanel extends JPanel {
         });
 
         playButton.addActionListener(e -> {
-            if(modeFlag.equals("EVE")) {
-                System.out.println("Tworzę automatyczne plansze dla EvE");
-            } else if(!boardsConfigured) {
-                System.out.println("Najpierw skonfiguruj plansze!");
-                return;
-            }
-            System.out.println("Wybrany tryb: "+modeFlag);
-            System.out.println("Rozmiar planszy: "+mapSize);
-            System.out.println("Wyspy: "+useIslands);
+            // if(modeFlag.equals("EVE")) {
+            //     System.out.println("Tworzę automatyczne plansze dla EvE");
+            // } else if(!boardsConfigured) {
+            //     System.out.println("Najpierw skonfiguruj plansze!");
+            //     return;
+            // }
+            // System.out.println("Wybrany tryb: "+modeFlag);
+            // System.out.println("Rozmiar planszy: "+mapSize);
+            // System.out.println("Wyspy: "+useIslands);
 
             mainGUI.showView("GAME");
         });
@@ -140,8 +147,9 @@ public class GameConfigPanel extends JPanel {
     }
 
     private void updatePlayButtonState() {
-        if(modeFlag.equals("EVE")) playButton.setEnabled(true);
-        else playButton.setEnabled(boardsConfigured);
+        // if(modeFlag.equals("EVE")) playButton.setEnabled(true);
+        // else playButton.setEnabled(boardsConfigured);
+        playButton.setEnabled(true);
     }
 
     private void printBoard(boolean[][] board){

@@ -2,6 +2,8 @@ package gamelogic;
 
 import gamelogic.enums.*;
 import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -141,8 +143,7 @@ public class Board implements Serializable {
 	            else
 	             	return ShotResult.HIT;
 	        }
-
-
+            
             case SHIP_WRECKED -> {
                 // już trafione
                 return ShotResult.HIT;
