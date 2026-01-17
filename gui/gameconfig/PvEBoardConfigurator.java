@@ -1,6 +1,5 @@
 package gui.gameconfig;
 
-import java.awt.*;
 import javax.swing.*;
 
 public class PvEBoardConfigurator extends BoardConfiguratorAbstract {
