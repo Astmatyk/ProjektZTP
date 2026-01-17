@@ -1,12 +1,20 @@
 package gui.gamePanel;
 
-import gamelogic.Game;
+import gamelogic.*;
+import gamelogic.enums.*;
+import javax.swing.Timer;
 
-public class EvEGamePanel extends GamePanelDecorator {
+/**
+ * Dekorator EvE z automatycznym sterowaniem botami.
+ */
+public class EvEGamePanel extends GamePanelDecorator implements GameListener {
+
+    private Player bot1;
+    private Player bot2;
+    private Timer gameLoop; // Mechanizm napędzający ruchy botów
 
     public EvEGamePanel(GamePanelInterface panel) {
         super(panel);
-        System.out.println("EvE Game Panel Behavior");
     }
 
     @Override
@@ -15,7 +23,71 @@ public class EvEGamePanel extends GamePanelDecorator {
     }
 
     @Override
-    public void bindGame(Game game){
+    public void bindGame(Game game) {
         wrappedPanel.bindGame(game);
+        
+        // Inicjalizacja botów
+        this.bot1 = game.getCurrentPlayer();
+        this.bot2 = game.getOpponent(bot1);
+        
+        // Tworzymy Timer, który co 500ms (pół sekundy) zmusi bota do ruchu
+        gameLoop = new Timer(500, e -> triggerBotMove());
+        gameLoop.start();
+
+        updateUIWithFullVisibility();
+    }
+
+    /**
+     * Metoda wymuszająca ruch aktualnego bota.
+     */
+    private void triggerBotMove() {
+        if (!(wrappedPanel instanceof ConGamePanel)) return;
+        ConGamePanel base = (ConGamePanel) wrappedPanel;
+        Game game = base.game;
+
+        if (game == null || game.isGameOver()) {
+            if (gameLoop != null) gameLoop.stop();
+            return;
+        }
+
+        Player currentBot = game.getCurrentPlayer();
+        
+        // Bot wybiera koordynaty (korzystamy z chooseCoordinates() klasy Player)
+        Coordinates coords = currentBot.chooseCoordinates();
+        
+        try {
+            // Wykonujemy strzał w logice gry
+            game.shoot(currentBot, coords);
+            // Po shoot() wywoła się notify(), który trafi do metody update() poniżej
+        } catch (Exception ex) {
+            System.err.println("Bot napotkał błąd: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    public void update(GameEvent event) {
+        // Przy każdym strzale odświeżamy widok
+        updateUIWithFullVisibility();
+        
+        // Jeśli gra się skończyła, zatrzymujemy pętlę
+        if (event.type == EventType.GAME_END) {
+            if (gameLoop != null) gameLoop.stop();
+        }
+    }
+
+    private void updateUIWithFullVisibility() {
+        if (!(wrappedPanel instanceof ConGamePanel)) return;
+        ConGamePanel base = (ConGamePanel) wrappedPanel;
+        
+        if (bot1 == null || bot2 == null) return;
+
+        // Rysujemy stan obu plansz własnych
+        for (int y = 0; y < base.mapSize; y++) {
+            for (int x = 0; x < base.mapSize; x++) {
+                base.setBtnColor(base.ownButtons[x][y], bot1.getOwnBoard(), x, y, false);
+                base.setBtnColor(base.oppButtons[x][y], bot2.getOwnBoard(), x, y, false);
+            }
+        }
+        base.updateStatusLabel();
     }
 }

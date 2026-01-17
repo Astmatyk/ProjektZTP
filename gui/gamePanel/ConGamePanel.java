@@ -6,18 +6,23 @@ import gui.MainGUI;
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * Bazowy panel gry. Odpowiada za strukturę UI i komunikację z modelem.
+ * Dzięki modyfikatorom protected i metodom pomocniczym, dekoratory mogą 
+ * łatwo zmieniać perspektywę wyświetlania (kto co widzi).
+ */
 public class ConGamePanel extends JPanel implements GamePanelInterface, GameListener {
 
-    private final MainGUI mainGUI;
-    private final int mapSize;
-    private final int CELL_SIZE = 30;
+    protected final MainGUI mainGUI;
+    protected final int mapSize;
+    protected final int CELL_SIZE = 30;
 
-    private JButton[][] ownButtons;
-    private JButton[][] oppButtons;
-    private JLabel statusLabel;
+    protected JButton[][] ownButtons;
+    protected JButton[][] oppButtons;
+    protected JLabel statusLabel;
 
-    private Game game;
-    private Player localPlayer; // Gracz, którego planszę "własną" wyświetlamy po lewej
+    protected Game game;
+    protected Player localPlayer; // Gracz, którego perspektywę prezentuje ten panel
 
     public ConGamePanel(MainGUI mainGUI, int size, String p1Name, String p2Name) {
         this.mainGUI = mainGUI;
@@ -27,96 +32,154 @@ public class ConGamePanel extends JPanel implements GamePanelInterface, GameList
 
         setLayout(new BorderLayout());
 
-        // UI Setup (Statyczne kontenery)
+        // UI Setup
         setupHeader(size);
         setupBoards(p1Name, p2Name);
         setupFooter();
     }
 
+    @Override
+    public void display() {
+        this.setVisible(true);
+        this.revalidate();
+        this.repaint();
+    }
+
+    @Override
     public void bindGame(Game game) {
         this.game = game;
+        // Domyślnie ustawiamy localPlayer na gracza, który zaczyna w modelu
         this.localPlayer = game.getCurrentPlayer();
         this.game.addListener(this);
         
         updateUIState();
     }
 
-    private void handleShotRequest(int x, int y) {
-        if (game == null || game.isGameOver()) return;
-
-        // Jeśli to nie tura gracza przypisanego do tego widoku - ignoruj
-        if (game.getCurrentPlayer() != localPlayer) return;
-
-        try {
-            // Po prostu wysyłamy informację do silnika
-            game.shoot(localPlayer, new Coordinates(x, y));
-        } catch (Exception ex) {
-            statusLabel.setText("Błąd: " + ex.getMessage());
-        }
-    }
-
-    private void updateUIState() {
+    /**
+     * Główna metoda odświeżająca interfejs.
+     */
+    public void updateUIState() {
         if (game == null || localPlayer == null) return;
 
-        // 1. Pobierz stan plansz z modelu i odśwież kolory
-        Board own = localPlayer.getOwnBoard();
-        Board shoot = localPlayer.getShootingBoard();
+        // Pobieramy logiczne plansze do wyświetlenia przez hooki dla dekoratorów
+        Board leftBoard = getBoardForDisplay(false); 
+        Board rightBoard = getBoardForDisplay(true);
 
         for (int y = 0; y < mapSize; y++) {
             for (int x = 0; x < mapSize; x++) {
-                setBtnColor(ownButtons[x][y], own.getFlag(x, y), true);
-                setBtnColor(oppButtons[x][y], shoot.getFlag(x, y), false);
+                setBtnColor(ownButtons[x][y], leftBoard, x, y, false);
+                setBtnColor(oppButtons[x][y], rightBoard, x, y, true);
             }
+        }
+        
+        updateStatusLabel();
+    }
+
+    /**
+     * Określa, którą planszę z modelu pobrać dla danej strony widoku.
+     */
+    protected Board getBoardForDisplay(boolean isOpponentPane) {
+        if (isOpponentPane) {
+            return localPlayer.getShootingBoard();
+        } else {
+            return localPlayer.getOwnBoard();
         }
     }
 
-    private void setBtnColor(JButton btn, MapFlags flag, boolean isOwn) {
+    /**
+     * Logika kolorowania przycisków na podstawie flag z Board.
+     */
+    protected void setBtnColor(JButton btn, Board board, int x, int y, boolean isOpponentBoard) {
+        MapFlags flag = board.getFlag(x, y);
+        
         switch (flag) {
-            case NOTHING -> btn.setBackground(Color.CYAN);
-            case SHIP -> btn.setBackground(isOwn ? Color.GRAY : Color.CYAN);
-            case SHIP_WRECKED -> btn.setBackground(Color.RED);
-            case NO_SHIP -> btn.setBackground(Color.BLACK);
+            case SHIP:
+                // Na planszy przeciwnika statki są ukryte (turkusowe)
+                btn.setBackground(isOpponentBoard ? Color.CYAN : Color.GRAY);
+                break;
+            case SHIP_WRECKED: // MapFlags z Twojego Player.java
+                btn.setBackground(Color.RED);
+                break;
+            case NO_SHIP: // MapFlags z Twojego Player.java
+                btn.setBackground(Color.WHITE);
+                break;
+            // Dodaję obsługę HIT/MISS/SUNK jeśli Twój Board używa innych enumów niż Player
+            default:
+                // Domyślny kolor wody
+                btn.setBackground(Color.CYAN);
+                break;
+        }
+    }
+
+    protected void updateStatusLabel() {
+        if (game == null) return;
+
+        if (game.isGameOver()) {
+            // Skoro gra się skończyła, CurrentPlayer w klasie Game to zwycięzca (ostatni strzelający)
+            statusLabel.setText("KONIEC GRY! Zwycięzca: " + game.getCurrentPlayer().toString());
+        } else {
+            statusLabel.setText("Tura gracza: " + game.getCurrentPlayer().toString());
+        }
+    }
+
+    /**
+     * NAPRAWIONE: Obsługuje strzał korzystając z metody shoot() dostępnej w klasie Game.
+     */
+    protected void handleShotRequest(int x, int y) {
+        if (game == null || game.isGameOver()) return;
+
+        // Sprawdzamy czy to tura "naszego" gracza (lokalnego)
+        if (game.getCurrentPlayer() == localPlayer) {
+            try {
+                // Wywołujemy shoot z klasy Game, przekazując aktualnego gracza i koordynaty
+                game.shoot(game.getCurrentPlayer(), new Coordinates(x, y));
+                // updateUIState() zostanie wywołane przez update(GameEvent)
+            } catch (IllegalStateException e) {
+                System.err.println("Błąd ruchu: " + e.getMessage());
+            }
         }
     }
 
     @Override
     public void update(GameEvent event) {
-        // Silnik gry wysłał info, że coś się zmieniło (strzał lub koniec)
-        SwingUtilities.invokeLater(() -> {
-            updateUIState();
-            
-            if (event.type == EventType.GAME_END) {
-                statusLabel.setText("KONIEC!");
-            }
-        });
+        // Każde zdarzenie w grze (strzał, koniec) odświeża widok
+        updateUIState();
+        
+        if (event.type == EventType.GAME_END) {
+            JOptionPane.showMessageDialog(this, "Koniec gry!");
+        }
     }
 
-    // --- BUDOWA WIDOKU ---
+    // --- Metody budujące UI (niezmienione strukturalnie) ---
 
-    private void setupHeader(int size) {
+    protected void setupHeader(int size) {
         JPanel header = new JPanel(new GridLayout(2, 1));
-        JLabel title = new JLabel("Bitwa morska: " + size + "x" + size, SwingConstants.CENTER);
-        title.setFont(new Font("SansSerif", Font.BOLD, 18));
+        JLabel title = new JLabel("BITWA MORSKA", SwingConstants.CENTER);
+        title.setFont(new Font("SansSerif", Font.BOLD, 24));
+        
         statusLabel = new JLabel("Inicjalizacja...", SwingConstants.CENTER);
+        statusLabel.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        
         header.add(title);
         header.add(statusLabel);
         add(header, BorderLayout.NORTH);
     }
 
-    private void setupBoards(String p1, String p2) {
+    protected void setupBoards(String p1Name, String p2Name) {
         JPanel container = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 20, 10, 20);
 
         gbc.gridx = 0;
-        container.add(createLabeledGrid(p1, ownButtons, false), gbc);
+        container.add(createLabeledGrid(p1Name + " (Twoja flota)", ownButtons, false), gbc);
+
         gbc.gridx = 1;
-        container.add(createLabeledGrid(p2, oppButtons, true), gbc);
+        container.add(createLabeledGrid(p2Name + " (Twoje strzały)", oppButtons, true), gbc);
 
         add(container, BorderLayout.CENTER);
     }
 
-    private JPanel createLabeledGrid(String title, JButton[][] matrix, boolean clickable) {
+    protected JPanel createLabeledGrid(String title, JButton[][] matrix, boolean clickable) {
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.add(new JLabel(title, SwingConstants.CENTER), BorderLayout.NORTH);
         
@@ -140,13 +203,19 @@ public class ConGamePanel extends JPanel implements GamePanelInterface, GameList
         return wrapper;
     }
 
-    private void setupFooter() {
+    protected void setupFooter() {
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
-        JButton menuBtn = new JButton("Menu");
+        JButton menuBtn = new JButton("Menu Główne");
         menuBtn.addActionListener(e -> mainGUI.showView("MENU"));
         footer.add(menuBtn);
         add(footer, BorderLayout.SOUTH);
     }
 
-    @Override public void display() { setVisible(true); }
+    public void setLocalPlayer(Player player) {
+        this.localPlayer = player;
+    }
+
+    public Player getLocalPlayer() {
+        return localPlayer;
+    }
 }
