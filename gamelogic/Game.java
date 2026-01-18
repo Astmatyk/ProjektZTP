@@ -53,13 +53,15 @@ public class Game {
         }
     }
 
+   
+    
     public ShotResult shoot(Player attacker, Coordinates coords) {
         if (gameOver || attacker != currentPlayer) {
             throw new IllegalStateException("Not your turn or game over");
         }
 
-        Player defender = getOpponent(attacker);
-
+        Player defender = getOpponent(currentPlayer);
+        
         // Board obrońcy przyjmuje strzał
         ShotResult result = defender.receiveShot(coords);
 
@@ -77,6 +79,7 @@ public class Game {
             if (result == ShotResult.MISS) {
                 currentPlayer = defender;
                 nextPlayer = attacker;
+                defender = getOpponent(currentPlayer);
             }
         }
 
@@ -86,6 +89,13 @@ public class Game {
         return result;
     }
 
+    public void playerTurn() {
+    	if(gameOver) return;
+    	
+    	Coordinates coords= currentPlayer.chooseCoordinates();
+    	shoot(currentPlayer, coords);
+    }
+    
     public Snapshot save(ShotResult result) {
         Snapshot snap = new Snapshot(player1, player2, currentPlayer, result);
         history.push(snap);
