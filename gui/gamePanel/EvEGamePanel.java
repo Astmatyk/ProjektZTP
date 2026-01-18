@@ -12,7 +12,9 @@ public class EvEGamePanel extends GamePanelDecorator implements GameListener {
     private Player bot1;
     private Player bot2;
     private Timer gameLoop; // Mechanizm napędzający ruchy botów
-
+    
+    ConGamePanel base = (ConGamePanel) wrappedPanel;
+    
     public EvEGamePanel(GamePanelInterface panel) {
         super(panel);
     }
@@ -41,28 +43,16 @@ public class EvEGamePanel extends GamePanelDecorator implements GameListener {
      * Metoda wymuszająca ruch aktualnego bota.
      */
     private void triggerBotMove() {
-        if (!(wrappedPanel instanceof ConGamePanel)) return;
-        ConGamePanel base = (ConGamePanel) wrappedPanel;
         Game game = base.game;
 
         if (game == null || game.isGameOver()) {
-            if (gameLoop != null) gameLoop.stop();
+            gameLoop.stop();
             return;
         }
 
-        Player currentBot = game.getCurrentPlayer();
-        
-        // Bot wybiera koordynaty (korzystamy z chooseCoordinates() klasy Player)
-        Coordinates coords = currentBot.chooseCoordinates();
-        
-        try {
-            // Wykonujemy strzał w logice gry
-            game.shoot(currentBot, coords);
-            // Po shoot() wywoła się notify(), który trafi do metody update() poniżej
-        } catch (Exception ex) {
-            System.err.println("Bot napotkał błąd: " + ex.getMessage());
-        }
+        game.playerTurn();
     }
+
 
     @Override
     public void update(GameEvent event) {
